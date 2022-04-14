@@ -98,28 +98,34 @@ class _MyHomePageState extends State<MyHomePage> {
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
-          children: const <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.green,
-              ),
-              child: Text(
-                'Drawer Header',
-                style: TextStyle(
+          children: <Widget>[
+            SizedBox(
+              height: 100,
+              child: DrawerHeader(
+                decoration: const BoxDecoration(
                   color: Colors.white,
-                  fontSize: 24,
+                ),
+                child: Container(
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    children: const <Widget>[
+                      Text("HELLO BOY"),
+                      Text("HELLO girl"),
+                    ],
+                  ),
                 ),
               ),
             ),
             ListTile(
-              leading: Icon(Icons.message),
-              title: Text('Messages'),
+              leading: const Icon(Icons.message),
+              title: const Text('Messages'),
+              onTap: () {},
             ),
-            ListTile(
+            const ListTile(
               leading: Icon(Icons.account_circle),
               title: Text('Profile'),
             ),
-            ListTile(
+            const ListTile(
               leading: Icon(Icons.settings),
               title: Text('Settings'),
             ),
