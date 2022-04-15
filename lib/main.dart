@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:badges/badges.dart';
 import 'package:skyewooapp/app_colors.dart';
+import 'package:skyewooapp/ui/drawer_widget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,6 +17,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Woo App',
       theme: ThemeData(
+        fontFamily: "Montserrat",
         primarySwatch: AppColors.primarySwatch,
         appBarTheme: const AppBarTheme(
             backgroundColor: Colors.white, foregroundColor: Colors.black),
@@ -51,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Scaffold.of(context).openDrawer();
               },
               icon: SvgPicture.asset(
-                "assets/images/icons8_align_left.svg",
+                "assets/icons/icons8_align_left.svg",
                 height: 30,
                 width: 30,
               ),
@@ -62,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             onPressed: () {},
             icon: SvgPicture.asset(
-              "assets/images/icons8_heart_outline.svg",
+              "assets/icons/icons8_heart_outline.svg",
               height: 25,
             ),
           ),
@@ -76,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               badgeColor: AppColors.primary,
               child: SvgPicture.asset(
-                "assets/images/icons8_shopping_bag.svg",
+                "assets/icons/icons8_shopping_bag.svg",
                 height: 25,
               ),
             ),
@@ -88,51 +90,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: IconButton(
                     onPressed: () {},
                     icon: SvgPicture.asset(
-                      "assets/images/icons8_search.svg",
+                      "assets/icons/icons8_search.svg",
                       height: 25,
                     )),
               )),
         ],
       ),
-
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            SizedBox(
-              height: 100,
-              child: DrawerHeader(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                ),
-                child: Container(
-                  alignment: Alignment.centerLeft,
-                  child: Row(
-                    children: const <Widget>[
-                      Text("HELLO BOY"),
-                      Text("HELLO girl"),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.message),
-              title: const Text('Messages'),
-              onTap: () {},
-            ),
-            const ListTile(
-              leading: Icon(Icons.account_circle),
-              title: Text('Profile'),
-            ),
-            const ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Settings'),
-            ),
-          ],
-        ),
-      ),
-
+      drawer: const AppDrawer(),
       // bottomNavigationBar: BottomNavigationBar(
       //   items: const <BottomNavigationBarItem>[
       //     BottomNavigationBarItem(
