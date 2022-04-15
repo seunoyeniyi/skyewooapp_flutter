@@ -8,7 +8,7 @@ import '../../../components/rounded_input_field.dart';
 import '../../../components/rounded_password_field.dart';
 import '../login/login_screen.dart';
 import 'background.dart';
-// import 'or_divider.dart';
+// import 'components/or_divider.dart';
 
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -30,7 +30,7 @@ class SignUpScreen extends StatelessWidget {
               SizedBox(height: size.height * 0.03),
               SvgPicture.asset(
                 "assets/icons/signup.svg",
-                height: size.height * 0.35,
+                height: size.height * 0.25,
               ),
               RoundedInputField(
                 hintText: "Username",
