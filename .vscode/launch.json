@@ -7,7 +7,19 @@
         {
             "name": "skyewooapp",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "flutterMode": "debug",
+            "args": [
+                "--no-sound-null-safety"
+            ]
+        },
+        {
+            "name": "skyewooapp",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--no-sound-null-safety"
+            ]
         },
         {
             "name": "skyewooapp (profile mode)",

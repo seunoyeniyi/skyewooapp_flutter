@@ -1,9 +1,31 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:skyewooapp/handlers/user_session.dart';
+import 'package:skyewooapp/main.dart';
 import 'package:skyewooapp/screens/welcome/welcome_screen.dart';
 
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends StatefulWidget {
   const AppDrawer({Key? key}) : super(key: key);
+
+  @override
+  State<AppDrawer> createState() => _AppDrawerState();
+}
+
+class _AppDrawerState extends State<AppDrawer> {
+  UserSession userSession = UserSession();
+
+  @override
+  void initState() {
+    init();
+    super.initState();
+  }
+
+  init() async {
+    await userSession.init();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,17 +83,10 @@ class AppDrawer extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const WelcomeScreen(),
-                                      ));
-                                },
-                                child: const Text(
-                                  "Log In",
-                                  style: TextStyle(fontSize: 12),
+                                onPressed: loginTapped,
+                                child: Text(
+                                  (userSession.logged()) ? "Account" : "Log In",
+                                  style: const TextStyle(fontSize: 12),
                                 ),
                               ),
                             ),
@@ -162,15 +177,44 @@ class AppDrawer extends StatelessWidget {
               onTap: () {},
             ),
             ListTile(
-              title: const Text(
-                'Log Out',
-                style: TextStyle(fontWeight: FontWeight.w600),
+              title: Text(
+                (userSession.logged()) ? "Log Out" : "Log In",
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
-              onTap: () {},
+              onTap: logoutTapped,
             ),
           ],
         ),
       ),
     );
+  }
+
+  loginTapped() {
+    Navigator.pop(context);
+    if (userSession.logged()) {
+      //go to account
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const WelcomeScreen(),
+        ),
+      );
+    }
+  }
+
+  logoutTapped() {
+    Navigator.pop(context);
+    if (userSession.logged()) {
+      userSession.logout();
+      MyHomePage.restartApp(context);
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const WelcomeScreen(),
+        ),
+      );
+    }
   }
 }
