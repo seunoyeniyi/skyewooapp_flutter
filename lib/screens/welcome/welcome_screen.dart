@@ -1,14 +1,10 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:skyewooapp/handlers/user_session.dart';
-import 'package:skyewooapp/screens/signup/signup_screen.dart';
 
 import '../../../components/rounded_button.dart';
 import '../../app_colors.dart';
-import '../login/login_screen.dart';
 import 'background.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -66,14 +62,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               RoundedButton(
                 text: "LOG IN",
                 press: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return const LoginScreen();
-                      },
-                    ),
-                  ).then((value) {
+                  await Navigator.pushNamed(context, "login").then((value) {
                     checkLogin();
                     setState(() {});
                   });
@@ -81,15 +70,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ),
               RoundedButton(
                 color: AppColors.secondary,
-                press: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return const SignUpScreen();
-                      },
-                    ),
-                  ).then((value) {
+                press: () async {
+                  await Navigator.pushNamed(context, "register").then((value) {
                     checkLogin();
                     setState(() {});
                   });

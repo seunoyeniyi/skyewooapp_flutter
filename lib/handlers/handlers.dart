@@ -13,3 +13,9 @@ class Toast {
     ).show(context);
   }
 }
+
+class AppRoute {
+  static String getName(BuildContext context) {
+    return ModalRoute.of(context)!.settings.name ?? "";
+  }
+}

@@ -17,7 +17,6 @@ import '../../../components/already_have_an_account_acheck.dart';
 import '../../../components/rounded_button.dart';
 import '../../../components/rounded_input_field.dart';
 import '../../../components/rounded_password_field.dart';
-import '../signup/signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -86,11 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(height: size.height * 0.03),
               AlreadyHaveAnAccountCheck(
                 press: () {
-                  Navigator.pushReplacement(context, MaterialPageRoute(
-                    builder: (context) {
-                      return const SignUpScreen();
-                    },
-                  ));
+                  Navigator.pushReplacementNamed(context, "register");
                 },
               ),
             ],
