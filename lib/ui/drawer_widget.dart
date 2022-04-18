@@ -29,7 +29,6 @@ class _AppDrawerState extends State<AppDrawer> {
     return SizedBox(
       width: 240,
       child: Drawer(
-        backgroundColor: Colors.white,
         child: ListTileTheme(
           textColor: Colors.black,
           iconColor: Colors.black,

@@ -57,7 +57,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Key key = UniqueKey();
+  Key? key = UniqueKey();
 
   final List<Widget> bodies = [
     const HomeBody(key: PageStorageKey("HomeBody")),

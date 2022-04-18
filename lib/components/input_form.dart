@@ -25,7 +25,7 @@ class InputForm<T> extends StatefulWidget {
 }
 
 class _InputFormState extends State<InputForm> {
-  String? val(String? val) {
+  String? val(String val) {
     return null;
   }
 
