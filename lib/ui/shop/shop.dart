@@ -12,20 +12,56 @@ class _ShopBodyState extends State<ShopBody> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Center(
-        child: Column(children: <Widget>[
-          Text(title),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                title = "Shopppppper";
-              });
-            },
-            child: const Text("Click"),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Material(
+            elevation: 1,
+            child: Container(
+              color: Colors.white,
+              width: double.infinity,
+              height: 50,
+              child: const Center(
+                child: Text("Head"),
+              ),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.only(top: 5),
+            color: Colors.white,
+            child: Column(
+              children: const [
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+                Text("Shop", style: TextStyle(fontSize: 30)),
+              ],
+            ),
           )
-        ]),
+        ],
       ),
     );
   }
