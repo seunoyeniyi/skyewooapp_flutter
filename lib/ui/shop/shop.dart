@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:skyewooapp/app_colors.dart';
+import 'package:skyewooapp/components/product_card.dart';
+import 'package:skyewooapp/models/products.dart';
 
 class ShopBody extends StatefulWidget {
   const ShopBody({Key? key}) : super(key: key);
@@ -100,40 +102,23 @@ class _ShopBodyState extends State<ShopBody> {
           Container(
             margin: const EdgeInsets.only(top: 5),
             color: Colors.white,
-            child: Column(
-              children: const [
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-                Text("Shop", style: TextStyle(fontSize: 30)),
-              ],
+            child: const Center(
+              child: Text("Shop"),
             ),
           )
         ],
       ),
     );
   }
+
+  List<Product> products = <Product>[
+    Product(name: "Home", id: "1"),
+    Product(name: 'Contact', id: "1"),
+    Product(name: 'Map', id: "1"),
+    Product(name: 'Phone', id: "1"),
+    Product(name: 'Camera', id: "1"),
+    Product(name: 'Setting', id: "1"),
+    Product(name: 'Album', id: "1"),
+    Product(name: 'WiFi', id: "1"),
+  ];
 }
