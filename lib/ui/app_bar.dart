@@ -18,6 +18,7 @@ class _AppAppBarState extends State<AppAppBar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      elevation: 0,
       title: Image.asset(
         'assets/images/logo-wow.png',
         fit: BoxFit.contain,
