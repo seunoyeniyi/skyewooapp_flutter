@@ -6,7 +6,7 @@ import 'package:skyewooapp/screens/login/login_screen.dart';
 import 'package:skyewooapp/screens/signup/signup_screen.dart';
 import 'package:skyewooapp/screens/welcome/welcome_screen.dart';
 import 'package:skyewooapp/ui/app_bar.dart';
-import 'package:skyewooapp/ui/drawer_widget.dart';
+import 'package:skyewooapp/ui/app_drawer.dart';
 import 'package:skyewooapp/ui/shop/shop.dart';
 
 void main() {

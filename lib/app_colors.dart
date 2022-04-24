@@ -11,6 +11,8 @@ class AppColors {
   static const link = Color.fromARGB(255, 110, 110, 110);
   static const f1 = Color(0xFFF1F1F1);
   static const hover = Color(0xFFC5C5C5);
+  static const black = Color(0xFF000000);
+  static const white = Color(0xFFFFFFFF);
   static const primarySwatch = appPrimarySwatch;
 }
 

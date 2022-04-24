@@ -28,6 +28,10 @@ class _ShopBodyState extends State<ShopBody> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+    final double itemHeight = (size.height - kToolbarHeight - 180) / 2;
+    final double itemWidth = size.width / 2;
+
     return Column(
       children: [
         Material(
@@ -97,31 +101,36 @@ class _ShopBodyState extends State<ShopBody> {
             ),
           ),
         ),
-        //SHOP PRODUCTS
-        SingleChildScrollView(
-          physics: const BouncingScrollPhysics(
-            parent: AlwaysScrollableScrollPhysics(),
-          ),
-          scrollDirection: Axis.vertical,
-          child: Column(
-            children: [
-              Expanded(
-                child: GridView.count(
-                  // shrinkWrap: true,
-                  // physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 4.0,
-                  mainAxisSpacing: 8.0,
-                  children: List.generate(2, (index) {
-                    return const Center(
-                      child: ProductCard(),
-                    );
-                  }),
-                ),
+        Expanded(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
+            scrollDirection: Axis.vertical,
+            child: Container(
+              color: AppColors.white,
+              padding: const EdgeInsets.all(10),
+              child: GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: (itemWidth / itemHeight),
+                children: List.generate(30, (index) {
+                  return const ProductCard(
+                      productTitle:
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                      image: "assets/images/background_login_image.jpg",
+                      regularPrice: "28",
+                      price: "24",
+                      inWishlist: false,
+                      discountValue: "25");
+                }),
               ),
-            ],
+            ),
           ),
-        )
+        ),
       ],
     );
   }

@@ -52,7 +52,7 @@ class Site {
   static String SEARCH = ADDRESS + "wp-json/skye-api/v1/search/";
   static String ADD_REVIEW = ADDRESS + "wp-json/skye-api/v1/add-review/";
 
-  static String CURRENCY = "‎د.ك‎‎";
+  static String CURRENCY = "₹";
   static String payment_method_title(String slug) {
     String title = "";
     switch (slug) {
