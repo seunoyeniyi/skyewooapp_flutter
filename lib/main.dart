@@ -60,8 +60,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Key? key = UniqueKey();
 
   final List<Widget> bodies = [
+    const ShopBody(key: PageStorageKey("ShopBody")),
     const HomeBody(key: PageStorageKey("HomeBody")),
-    const ShopBody(key: PageStorageKey("ShopBody"))
   ];
   int _bodyIndex = 0;
 

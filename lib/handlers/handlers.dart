@@ -19,3 +19,7 @@ class AppRoute {
     return ModalRoute.of(context)!.settings.name ?? "";
   }
 }
+
+bool isNumeric(String str) {
+  return double.tryParse(str) != null;
+}

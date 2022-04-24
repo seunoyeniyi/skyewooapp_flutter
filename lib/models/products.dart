@@ -13,13 +13,15 @@ class Product {
   String inWishList = "";
   String stockStatus = "";
   String lowestPrice = "0";
-  String get getId => this.id;
+  String highestPrice = "0";
 
   Product({this.id = "", this.name = ""});
 
-  set setId(String id) => this.id = id;
+  get getID => this.id;
 
-  get getType => this.type;
+  set setID(String id) => this.id = id;
+
+  String get getType => this.type;
 
   set setType(type) => this.type = type;
 
@@ -62,6 +64,11 @@ class Product {
   get getLowestPrice => this.lowestPrice;
 
   set setLowestPrice(lowestPrice) => this.lowestPrice = lowestPrice;
+
+  get getHighestPrice => this.highestPrice;
+
+  set setHighestPrice(highestPrice) => this.highestPrice = highestPrice;
+
   // JSONArray variations = new JSONArray();
   // JSONArray attributes = new JSONArray();
 
