@@ -2,11 +2,13 @@
 
 import 'dart:convert';
 
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:http/http.dart';
 import 'package:skyewooapp/app_colors.dart';
 import 'package:skyewooapp/components/product_card.dart';
+import 'package:skyewooapp/components/shimmer_product_card.dart';
 import 'package:skyewooapp/components/shimmer_shop.dart';
 import 'package:skyewooapp/handlers/handlers.dart';
 import 'package:skyewooapp/handlers/user_session.dart';
@@ -28,6 +30,8 @@ class _ShopBodyState extends State<ShopBody> {
   String paged = "1";
   int currentPaged = 1;
   bool isLoading = true;
+  ScrollController _scrollController =
+      ScrollController(initialScrollOffset: 5.0);
 
   String title = "Shop";
 
@@ -47,6 +51,8 @@ class _ShopBodyState extends State<ShopBody> {
   init() async {
     await userSession.init();
     fetchProducts();
+    _scrollController = ScrollController(initialScrollOffset: 5.0)
+      ..addListener(_scrollListener);
   }
 
   @override
@@ -138,7 +144,8 @@ class _ShopBodyState extends State<ShopBody> {
                 parent: AlwaysScrollableScrollPhysics(),
               ),
               scrollDirection: Axis.vertical,
-              child: (isLoading)
+              controller: _scrollController,
+              child: (isLoading && products.isEmpty)
                   ? ShopShimmer(
                       itemWidth: itemWidth,
                       itemHeight: itemHeight,
@@ -154,40 +161,64 @@ class _ShopBodyState extends State<ShopBody> {
   Widget productLayout(double itemWidth, double itemHeight) {
     return Container(
       padding: const EdgeInsets.all(10),
-      child: GridView.count(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: (itemWidth / itemHeight),
-        children: List.generate(products.length, (index) {
-          double regularPrice = (isNumeric(products[index].getRegularPrice))
-              ? double.parse(products[index].getRegularPrice)
-              : 0;
-          double price = double.parse(products[index].getPrice);
+      child: Column(
+        children: [
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: (itemWidth / itemHeight),
+            children: List.generate(products.length, (index) {
+              double regularPrice = (isNumeric(products[index].getRegularPrice))
+                  ? double.parse(products[index].getRegularPrice)
+                  : 0;
+              double price = double.parse(products[index].getPrice);
 
-          double discount = regularPrice - price;
+              double discount = regularPrice - price;
 
-          return ProductCard(
-            productTitle: products[index].getName,
-            image: products[index].getImage,
-            regularPrice: products[index].getRegularPrice,
-            price: products[index].getPrice,
-            inWishlist: false,
-            discountValue: (discount > 0) ? discount.toString() : "0",
-          );
-        }),
+              return ProductCard(
+                productTitle: products[index].getName,
+                image: products[index].getImage,
+                regularPrice: products[index].getRegularPrice,
+                price: products[index].getPrice,
+                inWishlist: false,
+                discountValue: (discount > 0) ? discount.toString() : "0",
+              );
+            }),
+          ),
+          //LOADING MORE DATA PLACE HOLDER
+          (isLoading && products.isNotEmpty)
+              ? loadingMoreShimmerPlaceholder(itemWidth, itemHeight)
+              : const SizedBox(height: 0),
+        ],
       ),
+    );
+  }
+
+  Widget loadingMoreShimmerPlaceholder(double itemWidth, double itemHeight) {
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
+      childAspectRatio: (itemWidth / itemHeight),
+      children: List.generate(4, (index) {
+        return const ShimmerProductCard();
+      }),
     );
   }
 
   fetchProducts() async {
     isLoading = true;
+    setState(() {});
+
     String url = Site.SIMPLE_PRODUCTS +
         "?orderby=" +
         order_by +
-        "?per_page=40&hide_description=1" +
+        "&per_page=40&hide_description=1" +
         "&user_id=" +
         userSession.ID +
         "&paged=" +
@@ -198,7 +229,8 @@ class _ShopBodyState extends State<ShopBody> {
     Response response = await get(url);
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> json = jsonDecode(response.body);
+      Map<String, dynamic> json =
+          jsonDecode(response.body.isEmpty ? "{}" : response.body);
       if (json.isNotEmpty) {
         List<Map<String, dynamic>> results = List.from(json["results"]);
         for (var item in results) {
@@ -225,16 +257,48 @@ class _ShopBodyState extends State<ShopBody> {
             currentPaged = int.parse(json["paged"]);
           }
         }
-
-        isLoading = false;
       } else {
-        Toast.show(context, "Oops.. No result");
+        if (products.isEmpty) {
+          Toast.show(context, "No result", title: "Oops");
+        } else {
+          Toast.show(
+            context,
+            "No more result",
+            title: "Oops",
+            position: FlushbarPosition.BOTTOM,
+            duration: 4,
+          );
+        }
       }
     } else {
       Toast.show(context, "Oops.. Error communication", title: "Error");
     }
 
     //update state after everything
-    setState(() {});
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  _scrollListener() {
+    if (_scrollController.offset >=
+            (_scrollController.position.maxScrollExtent - 500) &&
+        !_scrollController.position.outOfRange &&
+        !isLoading) {
+      setState(() {
+        // log("Loading more " + paged);
+        if (!isLoading) {
+          currentPaged = currentPaged + 1;
+          paged = currentPaged.toString();
+          fetchProducts();
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }

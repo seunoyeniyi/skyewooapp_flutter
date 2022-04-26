@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:skyewooapp/app_colors.dart';
+import 'package:skyewooapp/handlers/formatter.dart';
 import 'package:skyewooapp/handlers/handlers.dart';
 import 'package:skyewooapp/site.dart';
 import 'package:html_character_entities/html_character_entities.dart';
@@ -64,6 +65,7 @@ class _ProductCardState extends State<ProductCard> {
                       placeholder: (context, url) => Shimmer.fromColors(
                         baseColor: AppColors.f1,
                         highlightColor: Colors.white,
+                        period: const Duration(milliseconds: 500),
                         child: Container(
                           color: AppColors.hover,
                         ),
@@ -95,6 +97,7 @@ class _ProductCardState extends State<ProductCard> {
                       ),
                     ),
                     const SizedBox(height: 5),
+                    // PROUDCT TITLE, PRICES
                     Row(
                       children: [
                         Visibility(
@@ -102,7 +105,8 @@ class _ProductCardState extends State<ProductCard> {
                               widget.regularPrice != "0" &&
                               isNumeric(widget.regularPrice)),
                           child: Text(
-                            Site.CURRENCY + widget.regularPrice,
+                            Site.CURRENCY +
+                                Formatter.format(widget.regularPrice),
                             style: const TextStyle(
                               fontSize: 13,
                               decoration: TextDecoration.lineThrough,
@@ -112,7 +116,7 @@ class _ProductCardState extends State<ProductCard> {
                         ),
                         const SizedBox(width: 2),
                         Text(
-                          Site.CURRENCY + widget.price,
+                          Site.CURRENCY + Formatter.format(widget.price),
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
@@ -163,7 +167,8 @@ class _ProductCardState extends State<ProductCard> {
                 padding:
                     const EdgeInsets.only(left: 5, top: 2, right: 5, bottom: 2),
                 child: Text(
-                  "Save " + widget.discountValue,
+                  "Save " +
+                      double.parse(widget.discountValue).toStringAsFixed(1),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 11,

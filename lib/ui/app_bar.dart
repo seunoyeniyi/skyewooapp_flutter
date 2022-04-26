@@ -1,7 +1,14 @@
+import 'dart:convert';
+
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+// ignore: import_of_legacy_library_into_null_safe
+import 'package:http/http.dart';
 import 'package:skyewooapp/app_colors.dart';
+import 'package:skyewooapp/handlers/user_session.dart';
+import 'package:skyewooapp/site.dart';
+import 'package:skyewooapp/ui/search/search_delegate.dart';
 
 class AppAppBar extends StatefulWidget implements PreferredSizeWidget {
   const AppAppBar({Key? key, this.preferredSize = const Size.fromHeight(56.0)})
@@ -10,11 +17,35 @@ class AppAppBar extends StatefulWidget implements PreferredSizeWidget {
   @override
   final Size preferredSize;
 
+  static void updateCartCount(BuildContext context, String count) {
+    context.findAncestorStateOfType<_AppAppBarState>()!.updateCartCount(count);
+  }
+
   @override
   State<AppAppBar> createState() => _AppAppBarState();
 }
 
 class _AppAppBarState extends State<AppAppBar> {
+  UserSession userSession = UserSession();
+  String cartCount = "0";
+  bool showCartCount = false;
+
+  init() async {
+    await userSession.init();
+    cartCount = userSession.last_cart_count;
+    showCartCount = (int.parse(cartCount) > 0);
+    setState(() {});
+    if (userSession.logged()) {
+      fetchCart();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    init();
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -49,10 +80,11 @@ class _AppAppBarState extends State<AppAppBar> {
         IconButton(
           onPressed: () {},
           icon: Badge(
+            showBadge: showCartCount,
             padding: const EdgeInsets.all(5),
-            badgeContent: const Text(
-              '3',
-              style: TextStyle(color: Colors.white, fontSize: 12),
+            badgeContent: Text(
+              cartCount,
+              style: const TextStyle(color: Colors.white, fontSize: 12),
             ),
             badgeColor: AppColors.primary,
             child: SvgPicture.asset(
@@ -78,44 +110,35 @@ class _AppAppBarState extends State<AppAppBar> {
       ],
     );
   }
-}
 
-class AppBarSearchDelegate extends SearchDelegate {
-  @override
-  List<Widget>? buildActions(BuildContext context) {
-    return [
-      IconButton(
-          onPressed: () {
-            if (query.isEmpty) {
-              close(context, null); //close searchbar
-            } else {
-              query = "";
-            }
-          },
-          icon: const Icon(Icons.clear))
-    ];
+  fetchCart() async {
+    String url = Site.CART + userSession.ID + "?token_key=" + Site.TOKEN_KEY;
+    Response response = await get(url);
+
+    if (response.statusCode == 200) {
+      if (response.body.isNotEmpty) {
+        var body = jsonDecode(response.body);
+
+        if (body is Map) {
+          Map<String, dynamic> json = jsonDecode(response.body);
+
+          if (int.parse(json["contents_count"].toString()) > 0) {
+            showCartCount = true;
+            cartCount = json["contents_count"].toString();
+            userSession.update_last_cart_count(cartCount);
+          } else {
+            showCartCount = false;
+          }
+        }
+      }
+    }
+    setState(() {});
   }
 
-  @override
-  Widget? buildLeading(BuildContext context) {
-    return IconButton(
-        onPressed: () {
-          close(context, null); //close searchbar
-        },
-        icon: const Icon(Icons.arrow_back));
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    // TODO0: implement buildResults
-    return const Center(
-      child: Text("TODO Results"),
-    );
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    // TODO0: implement buildSuggestions
-    return const Text("Todo");
+  void updateCartCount(String count) {
+    setState(() {
+      cartCount = count;
+      showCartCount = (int.parse(cartCount) > 0);
+    });
   }
 }
