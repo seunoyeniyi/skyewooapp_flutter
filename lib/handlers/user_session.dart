@@ -8,6 +8,7 @@ class UserSession {
   String email = "";
   String last_orders_count = "0";
   String last_cart_count = "0";
+  String last_wishlist_count = "0";
   int date = DateTime.now().millisecondsSinceEpoch;
   bool _logged = false;
 
@@ -24,10 +25,11 @@ class UserSession {
     _logged = pref.getBool("logged") ?? false;
     last_orders_count = pref.getString("last_orders_count") ?? "0";
     last_cart_count = pref.getString("last_cart_count") ?? "0";
+    last_wishlist_count = pref.getString("last_wishlist_count") ?? "0";
   }
 
   Future<void> reload() async {
-    init();
+    await init();
   }
 
   Future<void> createLoginSession(
@@ -49,8 +51,8 @@ class UserSession {
     prefs.setBool("logged", logged);
   }
 
-  Map<String, dynamic> getDetails() {
-    init();
+  Future<Map<String, dynamic>> getDetails() async {
+    await init();
     Map<String, dynamic> data = {
       "ID": ID,
       "username": username,
@@ -58,7 +60,8 @@ class UserSession {
       "date": date,
       "logged": logged,
       "last_orders_count": last_orders_count,
-      "last_cart_count": last_cart_count
+      "last_cart_count": last_cart_count,
+      "last_wishlist_count": last_wishlist_count
     };
     return data;
   }
@@ -73,6 +76,12 @@ class UserSession {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("last_cart_count", count);
     last_cart_count = count;
+  }
+
+  Future<void> update_last_wishlist_count(String count) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("last_wishlist_count", count);
+    last_wishlist_count = count;
   }
 
   bool logged() {

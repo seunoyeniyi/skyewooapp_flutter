@@ -48,6 +48,8 @@ class _ShopBodyState extends State<ShopBody> {
     'Sort by price: high to low',
   ];
 
+  Text d = const Text("Hello");
+
   init() async {
     await userSession.init();
     fetchProducts();
@@ -179,11 +181,13 @@ class _ShopBodyState extends State<ShopBody> {
               double discount = regularPrice - price;
 
               return ProductCard(
+                userSession: userSession,
+                productID: products[index].getID,
                 productTitle: products[index].getName,
                 image: products[index].getImage,
                 regularPrice: products[index].getRegularPrice,
                 price: products[index].getPrice,
-                inWishlist: false,
+                inWishlist: (products[index].getInWishList == "true"),
                 discountValue: (discount > 0) ? discount.toString() : "0",
               );
             }),

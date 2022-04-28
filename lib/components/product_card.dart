@@ -1,4 +1,6 @@
 // ignore: import_of_legacy_library_into_null_safe
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -6,20 +8,28 @@ import 'package:shimmer/shimmer.dart';
 import 'package:skyewooapp/app_colors.dart';
 import 'package:skyewooapp/handlers/formatter.dart';
 import 'package:skyewooapp/handlers/handlers.dart';
+import 'package:skyewooapp/handlers/user_session.dart';
+import 'package:skyewooapp/handlers/wishlist.dart';
+import 'package:skyewooapp/main.dart';
 import 'package:skyewooapp/site.dart';
 import 'package:html_character_entities/html_character_entities.dart';
+import 'package:skyewooapp/ui/app_bar.dart';
 
 class ProductCard extends StatefulWidget {
-  const ProductCard(
-      {Key? key,
-      required this.productTitle,
-      required this.image,
-      required this.regularPrice,
-      required this.price,
-      required this.inWishlist,
-      required this.discountValue})
-      : super(key: key);
+  const ProductCard({
+    Key? key,
+    required this.userSession,
+    required this.productID,
+    required this.productTitle,
+    required this.image,
+    required this.regularPrice,
+    required this.price,
+    required this.inWishlist,
+    required this.discountValue,
+  }) : super(key: key);
 
+  final UserSession userSession;
+  final String productID;
   final String productTitle;
   final String image;
   final String regularPrice;
@@ -33,6 +43,21 @@ class ProductCard extends StatefulWidget {
 
 class _ProductCardState extends State<ProductCard> {
   Color bgColor = Colors.white;
+
+  //to use gain for state change
+  bool inWishlist = false;
+  UserSession userSession = UserSession();
+
+  init() async {
+    inWishlist = widget.inWishlist;
+    userSession = widget.userSession;
+  }
+
+  @override
+  void initState() {
+    init();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,9 +160,18 @@ class _ProductCardState extends State<ProductCard> {
           right: 0,
           top: 120,
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              setState(() {
+                if (inWishlist) {
+                  updateWishlist(widget.productID, "remove");
+                } else {
+                  updateWishlist(widget.productID, "add");
+                }
+                inWishlist = !inWishlist; //to change icon immediately
+              });
+            },
             child: SvgPicture.asset(
-              (widget.inWishlist)
+              (inWishlist)
                   ? "assets/icons/icons8_heart.svg"
                   : "assets/icons/icons8_heart_outline.svg",
               width: 17,
@@ -181,5 +215,28 @@ class _ProductCardState extends State<ProductCard> {
         )
       ],
     );
+  }
+
+  updateWishlist(String productID, String action) async {
+    Wishlist wishlist = Wishlist(userSession: userSession);
+    bool updated = await wishlist.update(userSession.ID, productID, action);
+
+    if (updated) {
+      if (action == "remove") {
+        inWishlist = false;
+        Toast.show(context, "Product removed from wishlist!", title: "Removed");
+      } else {
+        inWishlist = true;
+        Toast.show(context, "Product added to wishlist!", title: "Added");
+      }
+    } else {
+      Toast.show(context, "Coudn't update wishlist.", title: "Wishlist");
+    }
+
+    await userSession.reload();
+    MyHomePage.upateAppBarWishlistBadge(
+        context, userSession.last_wishlist_count);
+
+    setState(() {});
   }
 }

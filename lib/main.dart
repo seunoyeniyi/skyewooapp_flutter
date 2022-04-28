@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:skyewooapp/app_colors.dart';
@@ -52,6 +54,18 @@ class MyHomePage extends StatefulWidget {
     context.findAncestorStateOfType<_MyHomePageState>()!.changeBody(body);
   }
 
+  static void upateAppBarWishlistBadge(BuildContext context, String count) {
+    context
+        .findAncestorStateOfType<_MyHomePageState>()!
+        .upateAppBarWishlistBadge(count);
+  }
+
+  static void upateAppBarWCartCount(BuildContext context, String count) {
+    context
+        .findAncestorStateOfType<_MyHomePageState>()!
+        .upateAppBarWCartCount(count);
+  }
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -77,12 +91,16 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  AppAppBarController appBarController = AppAppBarController();
+
   @override
   Widget build(BuildContext context) {
     return KeyedSubtree(
       key: key,
       child: Scaffold(
-        appBar: const AppAppBar(),
+        appBar: AppAppBar(
+          controller: appBarController,
+        ),
         drawer: const AppDrawer(),
         body: IndexedStack(
           index: _bodyIndex,
@@ -91,5 +109,17 @@ class _MyHomePageState extends State<MyHomePage> {
         // This trailing comma makes auto-formatting nicer for build methods.
       ),
     );
+  }
+
+  void upateAppBarWishlistBadge(String count) {
+    if (appBarController.updateWishlistBadge != null) {
+      appBarController.updateWishlistBadge!(count);
+    }
+  }
+
+  void upateAppBarWCartCount(String count) {
+    if (appBarController.updateCartCount != null) {
+      appBarController.updateCartCount!(count);
+    }
   }
 }

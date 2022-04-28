@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
@@ -6,20 +7,22 @@ import 'package:flutter_svg/svg.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:http/http.dart';
 import 'package:skyewooapp/app_colors.dart';
+import 'package:skyewooapp/handlers/cart.dart';
 import 'package:skyewooapp/handlers/user_session.dart';
 import 'package:skyewooapp/site.dart';
 import 'package:skyewooapp/ui/search/search_delegate.dart';
 
 class AppAppBar extends StatefulWidget implements PreferredSizeWidget {
-  const AppAppBar({Key? key, this.preferredSize = const Size.fromHeight(56.0)})
-      : super(key: key);
+  const AppAppBar({
+    Key? key,
+    this.preferredSize = const Size.fromHeight(56.0),
+    required this.controller,
+  }) : super(key: key);
+
+  final AppAppBarController controller;
 
   @override
   final Size preferredSize;
-
-  static void updateCartCount(BuildContext context, String count) {
-    context.findAncestorStateOfType<_AppAppBarState>()!.updateCartCount(count);
-  }
 
   @override
   State<AppAppBar> createState() => _AppAppBarState();
@@ -29,6 +32,7 @@ class _AppAppBarState extends State<AppAppBar> {
   UserSession userSession = UserSession();
   String cartCount = "0";
   bool showCartCount = false;
+  bool showWishlistBadge = false;
 
   init() async {
     await userSession.init();
@@ -37,13 +41,15 @@ class _AppAppBarState extends State<AppAppBar> {
     setState(() {});
     if (userSession.logged()) {
       fetchCart();
+      showWishlistBadge = (int.parse(userSession.last_wishlist_count) > 0);
     }
   }
 
   @override
   void initState() {
-    super.initState();
+    widget.controller.updateWishlistBadge = updateWishlistBadge;
     init();
+    super.initState();
   }
 
   @override
@@ -72,14 +78,27 @@ class _AppAppBarState extends State<AppAppBar> {
       actions: <Widget>[
         IconButton(
           onPressed: () {},
-          icon: SvgPicture.asset(
-            "assets/icons/icons8_heart_outline.svg",
-            height: 25,
+          icon: Badge(
+            position: BadgePosition.topEnd(top: -8, end: -4),
+            showBadge: showWishlistBadge,
+            padding: const EdgeInsets.all(7),
+            badgeContent: const Text(
+              "",
+              style: TextStyle(color: Colors.white, fontSize: 12),
+            ),
+            badgeColor: Colors.red,
+            child: SvgPicture.asset(
+              (showWishlistBadge)
+                  ? "assets/icons/icons8_heart.svg"
+                  : "assets/icons/icons8_heart_outline.svg",
+              height: 25,
+            ),
           ),
         ),
         IconButton(
           onPressed: () {},
           icon: Badge(
+            position: BadgePosition.topEnd(top: -8, end: -4),
             showBadge: showCartCount,
             padding: const EdgeInsets.all(5),
             badgeContent: Text(
@@ -112,25 +131,13 @@ class _AppAppBarState extends State<AppAppBar> {
   }
 
   fetchCart() async {
-    String url = Site.CART + userSession.ID + "?token_key=" + Site.TOKEN_KEY;
-    Response response = await get(url);
-
-    if (response.statusCode == 200) {
-      if (response.body.isNotEmpty) {
-        var body = jsonDecode(response.body);
-
-        if (body is Map) {
-          Map<String, dynamic> json = jsonDecode(response.body);
-
-          if (int.parse(json["contents_count"].toString()) > 0) {
-            showCartCount = true;
-            cartCount = json["contents_count"].toString();
-            userSession.update_last_cart_count(cartCount);
-          } else {
-            showCartCount = false;
-          }
-        }
-      }
+    Cart cart = Cart(userSession: userSession);
+    cartCount = await cart.fetchCount();
+    if (int.parse(cartCount) > 0) {
+      showCartCount = true;
+      userSession.update_last_cart_count(cartCount);
+    } else {
+      showCartCount = false;
     }
     setState(() {});
   }
@@ -141,4 +148,15 @@ class _AppAppBarState extends State<AppAppBar> {
       showCartCount = (int.parse(cartCount) > 0);
     });
   }
+
+  void updateWishlistBadge(String count) {
+    setState(() {
+      showWishlistBadge = (int.parse(count) > 0);
+    });
+  }
+}
+
+class AppAppBarController {
+  void Function(String)? updateWishlistBadge;
+  void Function(String)? updateCartCount;
 }
