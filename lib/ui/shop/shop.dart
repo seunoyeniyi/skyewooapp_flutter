@@ -1,6 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
@@ -26,33 +27,34 @@ class _ShopBodyState extends State<ShopBody> {
   UserSession userSession = UserSession();
 
   List<Product> products = [];
-  String order_by = "title menu_order";
+
+  //default products fetch values
+  String order_by = "menu_order";
   String paged = "1";
   int currentPaged = 1;
+
   bool isLoading = true;
   ScrollController _scrollController =
       ScrollController(initialScrollOffset: 5.0);
 
-  String title = "Shop";
-
   // Initial Selected Value
-  String sortDropdownValue = 'Default sorting';
+  int sortIndex = 0;
 
   // List of items in our dropdown menu
-  var sortItems = [
-    'Default sorting',
-    'Sort by popularity',
-    'Sort by average rating',
-    'Sort by latest',
-    'Sort by price: low to high',
-    'Sort by price: high to low',
+  List<ProductSort> sortItems = [
+    ProductSort(name: "title menu_order", title: 'Default sorting'),
+    ProductSort(name: "popularity", title: 'Sort by popularity'),
+    ProductSort(name: "rating", title: 'Sort by average rating'),
+    ProductSort(name: "date", title: 'Sort by latest'),
+    ProductSort(name: "price", title: 'Sort by price: low to high'),
+    ProductSort(name: "price-desc", title: 'Sort by price: high to low'),
   ];
 
   Text d = const Text("Hello");
 
   init() async {
     await userSession.init();
-    fetchProducts();
+    fetchProducts(append: false);
     _scrollController = ScrollController(initialScrollOffset: 5.0)
       ..addListener(_scrollListener);
   }
@@ -91,24 +93,26 @@ class _ShopBodyState extends State<ShopBody> {
                   Expanded(
                     child: ButtonTheme(
                       alignedDropdown: true,
-                      child: DropdownButton(
+                      child: DropdownButton<ProductSort>(
                         isExpanded: true,
-                        value: sortDropdownValue,
+                        value: sortItems[sortIndex],
                         icon: const Icon(Icons.arrow_drop_down),
-                        items: sortItems.map((String items) {
+                        items: sortItems.map((ProductSort item) {
                           return DropdownMenuItem(
-                            value: items,
+                            value: item,
                             child: Text(
-                              items,
+                              item.title,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           );
                         }).toList(),
-                        onChanged: (String? newValue) {
+                        onChanged: (value) {
                           setState(() {
-                            sortDropdownValue = newValue!;
+                            sortIndex = sortItems.indexOf(value!);
+                            order_by = value.getName;
+                            fetchProducts(append: false);
                           });
                         },
                         underline: const SizedBox(),
@@ -152,7 +156,7 @@ class _ShopBodyState extends State<ShopBody> {
                       itemWidth: itemWidth,
                       itemHeight: itemHeight,
                     )
-                  : productLayout(itemWidth, itemHeight),
+                  : productsLayout(itemWidth, itemHeight),
             ),
           ),
         ],
@@ -160,7 +164,7 @@ class _ShopBodyState extends State<ShopBody> {
     );
   }
 
-  Widget productLayout(double itemWidth, double itemHeight) {
+  Widget productsLayout(double itemWidth, double itemHeight) {
     return Container(
       padding: const EdgeInsets.all(10),
       child: Column(
@@ -215,9 +219,14 @@ class _ShopBodyState extends State<ShopBody> {
     );
   }
 
-  fetchProducts() async {
+  fetchProducts({bool append = true}) async {
     isLoading = true;
-    setState(() {});
+    setState(() {
+      if (append == false) {
+        //clear products and add new
+        products.clear();
+      }
+    });
 
     String url = Site.SIMPLE_PRODUCTS +
         "?orderby=" +
@@ -237,11 +246,17 @@ class _ShopBodyState extends State<ShopBody> {
           jsonDecode(response.body.isEmpty ? "{}" : response.body);
       if (json.isNotEmpty) {
         List<Map<String, dynamic>> results = List.from(json["results"]);
+
+        if (append == false && results.isEmpty) {
+          Toast.show(context, "No Result", title: "No Products");
+        }
+
         for (var item in results) {
+          // log("image: " + item["image"].toString());
           Product product = Product();
           product.setID = item["ID"].toString();
           product.setName = item["name"].toString();
-          product.setImage = item["image"].toString().toString();
+          product.setImage = item["image"].toString();
           product.setPrice = item["price"].toString();
           product.setRegularPrice = item["regular_price"].toString();
           product.setType = item["type"].toString();
@@ -305,4 +320,19 @@ class _ShopBodyState extends State<ShopBody> {
     _scrollController.dispose();
     super.dispose();
   }
+}
+
+class ProductSort {
+  String name;
+  String title;
+
+  ProductSort({required this.name, required this.title});
+
+  String get getName => name;
+
+  set setName(String name) => this.name = name;
+
+  String get getTitle => title;
+
+  set setTitle(title) => this.title = title;
 }

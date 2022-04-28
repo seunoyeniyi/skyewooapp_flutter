@@ -1,15 +1,9 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-// ignore: import_of_legacy_library_into_null_safe
-import 'package:http/http.dart';
 import 'package:skyewooapp/app_colors.dart';
 import 'package:skyewooapp/handlers/cart.dart';
 import 'package:skyewooapp/handlers/user_session.dart';
-import 'package:skyewooapp/site.dart';
 import 'package:skyewooapp/ui/search/search_delegate.dart';
 
 class AppAppBar extends StatefulWidget implements PreferredSizeWidget {

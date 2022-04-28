@@ -1,6 +1,4 @@
 // ignore: import_of_legacy_library_into_null_safe
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -13,7 +11,6 @@ import 'package:skyewooapp/handlers/wishlist.dart';
 import 'package:skyewooapp/main.dart';
 import 'package:skyewooapp/site.dart';
 import 'package:html_character_entities/html_character_entities.dart';
-import 'package:skyewooapp/ui/app_bar.dart';
 
 class ProductCard extends StatefulWidget {
   const ProductCard({
@@ -84,22 +81,34 @@ class _ProductCardState extends State<ProductCard> {
                   borderRadius: BorderRadius.all(Radius.circular(0)),
                 ),
                 child: FittedBox(
-                    fit: BoxFit.cover,
-                    child: CachedNetworkImage(
-                      imageUrl: widget.image,
-                      placeholder: (context, url) => Shimmer.fromColors(
-                        baseColor: AppColors.f1,
-                        highlightColor: Colors.white,
-                        period: const Duration(milliseconds: 500),
-                        child: Container(
-                          color: AppColors.hover,
+                  fit: BoxFit.cover,
+                  child: (() {
+                    if (widget.image.isNotEmpty &&
+                        widget.image != "false" &&
+                        Uri.parse(widget.image).isAbsolute) {
+                      return CachedNetworkImage(
+                        imageUrl: widget.image,
+                        placeholder: (context, url) => Shimmer.fromColors(
+                          baseColor: AppColors.f1,
+                          highlightColor: Colors.white,
+                          period: const Duration(milliseconds: 500),
+                          child: Container(
+                            color: AppColors.hover,
+                          ),
                         ),
-                      ),
-                      errorWidget: (context, url, error) => const Padding(
+                        errorWidget: (context, url, error) => const Padding(
+                          padding: EdgeInsets.all(80.0),
+                          child: Icon(Icons.error),
+                        ),
+                      );
+                    } else {
+                      return const Padding(
                         padding: EdgeInsets.all(80.0),
                         child: Icon(Icons.error),
-                      ),
-                    )),
+                      );
+                    }
+                  })(),
+                ),
               ),
               Container(
                 color: Colors.transparent,
