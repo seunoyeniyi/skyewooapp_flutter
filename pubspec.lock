@@ -113,6 +113,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "6.1.2"
+  flex_color_picker:
+    dependency: "direct main"
+    description:
+      name: flex_color_picker
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.5.0"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -170,6 +177,20 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  fluttertoast:
+    dependency: "direct main"
+    description:
+      name: fluttertoast
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "7.0.4"
+  get:
+    dependency: "direct main"
+    description:
+      name: get
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.6.1"
   html:
     dependency: transitive
     description:
@@ -233,6 +254,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.12.10"
+  material_color_utilities:
+    dependency: transitive
+    description:
+      name: material_color_utilities
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.5"
   meta:
     dependency: transitive
     description:

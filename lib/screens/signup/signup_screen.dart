@@ -192,9 +192,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
             json["data"] == "null") {
           SmartDialog.dismiss();
           if (json.containsKey("message")) {
-            Toast.show(context, json["message"], title: "");
+            ToastBar.show(context, json["message"], title: "");
           } else {
-            Toast.show(context, "Unable to get you registered at the moment!",
+            ToastBar.show(
+                context, "Unable to get you registered at the moment!",
                 title: "Access Denied");
           }
         } else {
@@ -207,6 +208,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               xemail: data["user_email"],
               logged: true);
           // Toast.show(context, "Registration completed!", title: "Success"); //causes error here, should be used on home page or checkout page
+          Toaster.show(message: "Registration completed!");
           userSession.reload();
           SmartDialog.dismiss();
 
@@ -217,7 +219,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         }
       } else {
         SmartDialog.dismiss();
-        Toast.show(context, "Coudn't get any result!");
+        ToastBar.show(context, "Coudn't get any result!");
       }
     } else {
       SmartDialog.dismiss();

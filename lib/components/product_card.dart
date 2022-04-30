@@ -2,6 +2,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+// ignore: import_of_legacy_library_into_null_safe
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:skyewooapp/app_colors.dart';
 import 'package:skyewooapp/handlers/formatter.dart';
@@ -227,19 +229,28 @@ class _ProductCardState extends State<ProductCard> {
   }
 
   updateWishlist(String productID, String action) async {
+    if (!userSession.logged()) {
+      ToastBar.show(context, "You need to login or sign up to add to wishlist!",
+          title: "Login Required");
+      return;
+    }
+
     Wishlist wishlist = Wishlist(userSession: userSession);
     bool updated = await wishlist.update(userSession.ID, productID, action);
 
     if (updated) {
       if (action == "remove") {
         inWishlist = false;
-        Toast.show(context, "Product removed from wishlist!", title: "Removed");
+        Toaster.show(
+            message: "Product removed from wishlist!",
+            gravity: ToastGravity.TOP);
       } else {
         inWishlist = true;
-        Toast.show(context, "Product added to wishlist!", title: "Added");
+        Toaster.show(
+            message: "Product added to wishlist!", gravity: ToastGravity.TOP);
       }
     } else {
-      Toast.show(context, "Coudn't update wishlist.", title: "Wishlist");
+      Toaster.show(message: "Coudn't update wishlist.");
     }
 
     await userSession.reload();

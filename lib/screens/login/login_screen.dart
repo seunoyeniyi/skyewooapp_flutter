@@ -141,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
             json["data"] == null ||
             json["data"] == "null") {
           SmartDialog.dismiss();
-          Toast.show(context, "Incorrect login details!",
+          ToastBar.show(context, "Incorrect login details!",
               title: "Access Denied");
         } else {
           Map<String, dynamic> data = json["data"];
@@ -153,6 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
               xemail: data["user_email"],
               logged: true);
           // Toast.show(context, "Welcome Back!", title: "Success"); //causes error here, should be used on home page or checkout page
+          Toaster.show(message: "Welcome Back!");
           userSession.reload();
           SmartDialog.dismiss();
 
@@ -163,7 +164,7 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       } else {
         SmartDialog.dismiss();
-        Toast.show(context, "Coudn't get any result!");
+        ToastBar.show(context, "Coudn't get any result!");
       }
     } else {
       SmartDialog.dismiss();

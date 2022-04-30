@@ -44,6 +44,7 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
+  //SETUP STATIC FUNCTIONS
   static void restartApp(BuildContext context) {
     context.findAncestorStateOfType<_MyHomePageState>()!.restartApp();
   }
@@ -63,6 +64,12 @@ class MyHomePage extends StatefulWidget {
         .findAncestorStateOfType<_MyHomePageState>()!
         .upateAppBarWCartCount(count);
   }
+
+  static void showSearchBar(BuildContext context) {
+    context.findAncestorStateOfType<_MyHomePageState>()!.showSearchBar();
+  }
+
+  //END STATIC FUNCTIONS
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -118,6 +125,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void upateAppBarWCartCount(String count) {
     if (appBarController.updateCartCount != null) {
       appBarController.updateCartCount!(count);
+    }
+  }
+
+  void showSearchBar() {
+    if (appBarController.displaySearch != null) {
+      appBarController.displaySearch!();
     }
   }
 }

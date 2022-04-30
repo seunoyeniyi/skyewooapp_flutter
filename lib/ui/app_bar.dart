@@ -41,7 +41,11 @@ class _AppAppBarState extends State<AppAppBar> {
 
   @override
   void initState() {
+    //apply controllers
     widget.controller.updateWishlistBadge = updateWishlistBadge;
+    widget.controller.updateCartCount = updateCartCount;
+    widget.controller.displaySearch = displaySearch;
+
     init();
     super.initState();
   }
@@ -124,6 +128,10 @@ class _AppAppBarState extends State<AppAppBar> {
     );
   }
 
+  void displaySearch() {
+    showSearch(context: context, delegate: AppBarSearchDelegate());
+  }
+
   fetchCart() async {
     Cart cart = Cart(userSession: userSession);
     cartCount = await cart.fetchCount();
@@ -153,4 +161,5 @@ class _AppAppBarState extends State<AppAppBar> {
 class AppAppBarController {
   void Function(String)? updateWishlistBadge;
   void Function(String)? updateCartCount;
+  void Function()? displaySearch;
 }
