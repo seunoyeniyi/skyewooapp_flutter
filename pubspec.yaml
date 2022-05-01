@@ -41,6 +41,7 @@ dependencies:
   cached_network_image: ^2.4.0
   shimmer: ^2.0.0
   get: ^4.6.1
+  dotted_border: ^2.0.0+2
 
 
   # The following adds the Cupertino Icons font to your application.

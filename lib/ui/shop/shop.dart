@@ -258,7 +258,9 @@ class _ShopBodyState extends State<ShopBody> {
 }
 
 filterResult(dynamic result) {
-  log(result.toString());
+  if (result != null) {
+    log(result.toString());
+  }
 }
 
 class ProductSort {

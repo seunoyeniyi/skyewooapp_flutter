@@ -119,6 +119,7 @@ class _ProductCardState extends State<ProductCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    //PRODUCT TITLE
                     SizedBox(
                       height: 25,
                       child: Text(
@@ -133,7 +134,7 @@ class _ProductCardState extends State<ProductCard> {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    // PROUDCT TITLE, PRICES
+                    // PROUDCT PRICES
                     Row(
                       children: [
                         Visibility(
