@@ -11,6 +11,9 @@ import 'package:skyewooapp/components/shimmer_shop.dart';
 import 'package:skyewooapp/controllers/products_controller.dart';
 import 'package:skyewooapp/handlers/handlers.dart';
 import 'package:skyewooapp/main.dart';
+import 'package:skyewooapp/models/category.dart';
+import 'package:skyewooapp/models/option.dart';
+import 'package:skyewooapp/models/tag.dart';
 import 'package:skyewooapp/ui/filter_dialog.dart';
 
 class ShopBody extends StatefulWidget {
@@ -26,6 +29,16 @@ class _ShopBodyState extends State<ShopBody> {
 
   ScrollController _scrollController =
       ScrollController(initialScrollOffset: 5.0);
+
+  //FILTER LISTs
+  List<Category>? categories;
+  List<Tag>? tags;
+  List<Option>? colors;
+  RangeValues? priceRange;
+  //INDEX
+  int? selectedCatIndex;
+  int? selectedTagIndex;
+  int? selectedColorIndex;
 
   // Initial Selected Value
   int sortIndex = 0;
@@ -128,7 +141,21 @@ class _ShopBodyState extends State<ShopBody> {
                             showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
-                                  return const FilterDialog();
+                                  return FilterDialog(
+                                    categories: categories,
+                                    tags: tags,
+                                    colors: colors,
+                                    priceRange: priceRange,
+                                    selectedCatIndex: selectedCatIndex,
+                                    selectedColorIndex: selectedColorIndex,
+                                    selectedTagIndex: selectedTagIndex,
+                                    selected_category:
+                                        productsController.selected_category,
+                                    selected_color:
+                                        productsController.selected_color,
+                                    selected_tag:
+                                        productsController.selected_tag,
+                                  );
                                 }).then(filterResult);
                           },
                           icon: const Icon(
@@ -237,7 +264,8 @@ class _ShopBodyState extends State<ShopBody> {
     if (_scrollController.offset >=
             (_scrollController.position.maxScrollExtent - 500) &&
         !_scrollController.position.outOfRange &&
-        !productsController.isLoading.value) {
+        !productsController.isLoading.value &&
+        !productsController.gotToEnd.value) {
       // log("Loading more " + productsController.paged);
       if (!productsController.isLoading.value) {
         // currentPaged = currentPaged + 1;
@@ -255,11 +283,26 @@ class _ShopBodyState extends State<ShopBody> {
     _scrollController.dispose();
     super.dispose();
   }
-}
 
-filterResult(dynamic result) {
-  if (result != null) {
-    log(result.toString());
+  filterResult(dynamic result) {
+    if (result != null) {
+      if (result is Map) {
+        categories = result["categories"];
+        tags = result["tags"];
+        colors = result["colors"];
+        priceRange = result["price_range"];
+
+        selectedCatIndex = result["selected_cat_index"];
+        selectedTagIndex = result["selected_tag_index"];
+        selectedColorIndex = result["selected_color_index"];
+
+        productsController.selected_category = result["selected_category"];
+        productsController.selected_tag = result["selected_tag"];
+        productsController.selected_color = result["selected_color"];
+        productsController.priceRange = result["price_range"];
+        productsController.fetchProducts(append: false);
+      }
+    }
   }
 }
 

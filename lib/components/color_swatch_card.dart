@@ -1,9 +1,6 @@
-import 'dart:developer';
-
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:html_character_entities/html_character_entities.dart';
-import 'package:skyewooapp/app_colors.dart';
 
 class ColorSwatchCard extends StatefulWidget {
   const ColorSwatchCard({
@@ -34,6 +31,10 @@ class _ColorSwatchCardState extends State<ColorSwatchCard> {
     {"pink": Colors.pink},
     {"purple": Colors.purple},
     {"yellow": Colors.yellow},
+    {"blue-corban": const Color(0xFF314174)},
+    {"gray": const Color(0xFF808080)},
+    {"grey": Colors.grey},
+    {"navyblue": const Color(0xFF000080)},
   ];
 
   @override

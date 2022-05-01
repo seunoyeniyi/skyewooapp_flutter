@@ -22,12 +22,24 @@ class FilterDialog extends StatefulWidget {
     this.tags,
     this.priceRange,
     this.colors,
+    this.selectedCatIndex,
+    this.selectedColorIndex,
+    this.selectedTagIndex,
+    this.selected_category,
+    this.selected_color,
+    this.selected_tag,
   }) : super(key: key);
 
   final List<Category>? categories;
   final List<Tag>? tags;
   final RangeValues? priceRange;
   final List<Option>? colors;
+  final String? selected_category;
+  final String? selected_tag;
+  final String? selected_color;
+  final int? selectedCatIndex;
+  final int? selectedTagIndex;
+  final int? selectedColorIndex;
 
   @override
   State<FilterDialog> createState() => _FilterDialogState();
@@ -36,9 +48,9 @@ class FilterDialog extends StatefulWidget {
 class _FilterDialogState extends State<FilterDialog> {
   //LIST
   List<Category> categories = [
-    Category(name: "Select a category", slug: "")
+    Category(name: "All categories", slug: "")
   ]; //default
-  List<Tag> tags = [Tag(name: "Select a tag", slug: "")]; //default
+  List<Tag> tags = [Tag(name: "All tags", slug: "")]; //default
   // List<AttributeTerm> sizes = [AttributeTerm(name: "Any", slug: "")]; //default for size
   List<Option> colors = [Option(name: "", value: "Any")];
 
@@ -86,13 +98,67 @@ class _FilterDialogState extends State<FilterDialog> {
       fetchTags();
     }
 
+    //indexs
+    if (widget.selectedCatIndex != null) {
+      selectedCatIndex = widget.selectedCatIndex!;
+    }
+    if (widget.selectedColorIndex != null) {
+      selectedColorIndex = widget.selectedColorIndex!;
+    }
+    if (widget.selectedTagIndex != null) {
+      selectedTagIndex = widget.selectedTagIndex!;
+    }
+
+    //selected slug
+    if (widget.selected_category != null) {
+      selected_category = widget.selected_category!;
+    }
+    if (widget.selected_tag != null) {
+      selected_tag = widget.selected_tag!;
+    }
+    if (widget.selected_color != null) {
+      selected_color = widget.selected_color!;
+    }
+
+    //don't use widget.any-value after this line
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Row(
+          children: const [
+            Icon(
+              Icons.sort,
+              size: 20,
+            ),
+            SizedBox(width: 5),
+            Text(
+              "Filter",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.close,
+              size: 30,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
         child: contentBox(context),
       ),
     );
@@ -101,202 +167,20 @@ class _FilterDialogState extends State<FilterDialog> {
   contentBox(context) {
     return Container(
       color: Colors.white,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          //TITLE
-          Container(
-            color: Colors.black,
-            width: double.infinity,
-            child: Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 15,
-                    top: 15,
-                    right: 15,
-                    bottom: 15,
-                  ),
-                  child: Row(
-                    children: const [
-                      Icon(
-                        Icons.sort,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      SizedBox(width: 5),
-                      Text(
-                        "Filter",
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  child: TextButton(
-                    style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.resolveWith((states) {
-                        if (states.contains(MaterialState.pressed)) {
-                          return AppColors.primaryHover;
-                        }
-                        return Colors.transparent;
-                      }),
-                    ),
-                    child: const Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                )
-              ],
-            ),
-          ),
-          // const Divider(color: Colors.grey),
-          //BODY
-          Padding(
-            padding: const EdgeInsets.all(15),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              //######Category#######
+              const Text(
+                " Category",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              Stack(
                 children: [
-                  //######Category#######
-                  const Text(
-                    " Category",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  Stack(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(
-                            color: AppColors.hover,
-                            style: BorderStyle.solid,
-                          ),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: ButtonTheme(
-                          alignedDropdown: true,
-                          child: DropdownButton<Category>(
-                            isExpanded: true,
-                            value: categories[selectedCatIndex],
-                            icon: const Icon(Icons.arrow_drop_down),
-                            items: categories.map((Category item) {
-                              return DropdownMenuItem(
-                                value: item,
-                                child: Text(
-                                  HtmlCharacterEntities.decode(item.getName),
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                selectedCatIndex = categories.indexOf(value!);
-                                selected_category = value.getSlug;
-                              });
-                            },
-                            underline: const SizedBox(),
-                          ),
-                        ),
-                      ),
-                      Visibility(
-                        visible: loadingCategories,
-                        child: const Positioned(
-                          top: 14,
-                          right: 7,
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.grey,
-                            strokeWidth: 2.0,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  //######End Category#######
-
-                  //######Colour#######
-                  const Text(
-                    "Colour",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  Stack(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(
-                            color: AppColors.hover,
-                            style: BorderStyle.solid,
-                          ),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: GridView.count(
-                          crossAxisCount: 5,
-                          mainAxisSpacing: 2,
-                          crossAxisSpacing: 2,
-                          shrinkWrap: true,
-                          scrollDirection: Axis.vertical,
-                          children: List.generate(colors.length, (index) {
-                            return Container(
-                              margin: const EdgeInsets.all(2),
-                              child: ColorSwatchCard(
-                                name: colors[index].getValue,
-                                slug: colors[index].getName,
-                                selected: index == selectedColorIndex,
-                                onTap: () {
-                                  setState(() {
-                                    selectedColorIndex = index;
-                                    selected_color = colors[index].getName;
-                                  });
-                                },
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                      Visibility(
-                        visible: loadingColors,
-                        child: const Positioned(
-                          top: 30,
-                          right: 30,
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.grey,
-                            strokeWidth: 2.0,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  //######End Colour#######
-
-                  //######Price#######
-                  const Text(
-                    " Price",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -306,117 +190,249 @@ class _FilterDialogState extends State<FilterDialog> {
                       ),
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        const SizedBox(height: 10),
-                        Center(
-                          child: Text(
-                            Site.CURRENCY +
-                                priceRange!.start.round().toString() +
-                                " - " +
-                                Site.CURRENCY +
-                                priceRange!.end.round().toString(),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        RangeSlider(
-                          min: 0,
-                          max: maximumPrice,
-                          values: priceRange!,
-                          divisions: 20,
-                          labels: RangeLabels(
-                            priceRange!.start.round().toString(),
-                            priceRange!.end.round().toString(),
-                          ),
-                          onChanged: (RangeValues values) {
-                            setState(() {
-                              priceRange = values;
-                            });
-                          },
-                        ),
-                      ],
+                    child: ButtonTheme(
+                      alignedDropdown: true,
+                      child: DropdownButton<Category>(
+                        isExpanded: true,
+                        value: categories[selectedCatIndex],
+                        icon: const Icon(Icons.arrow_drop_down),
+                        items: categories.map((Category item) {
+                          return DropdownMenuItem(
+                            value: item,
+                            child: Text(
+                              HtmlCharacterEntities.decode(item.getName),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedCatIndex = categories.indexOf(value!);
+                            selected_category = value.getSlug;
+                          });
+                        },
+                        underline: const SizedBox(),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  //######End Price#######
-
-                  //######Tag#######
-                  const Text(
-                    " Tag",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  Stack(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(
-                            color: AppColors.hover,
-                            style: BorderStyle.solid,
-                          ),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: ButtonTheme(
-                          alignedDropdown: true,
-                          child: DropdownButton<Tag>(
-                            isExpanded: true,
-                            value: tags[selectedTagIndex],
-                            icon: const Icon(Icons.arrow_drop_down),
-                            items: tags.map((Tag item) {
-                              return DropdownMenuItem(
-                                value: item,
-                                child: Text(
-                                    HtmlCharacterEntities.decode(item.getName)),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                selectedTagIndex = tags.indexOf(value!);
-                                selected_tag = value.getSlug;
-                              });
-                            },
-                            underline: const SizedBox(),
-                          ),
-                        ),
+                  Visibility(
+                    visible: loadingCategories,
+                    child: const Positioned(
+                      top: 14,
+                      right: 7,
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.grey,
+                        strokeWidth: 2.0,
                       ),
-                      Visibility(
-                        visible: loadingTags,
-                        child: const Positioned(
-                          top: 14,
-                          right: 7,
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.grey,
-                            strokeWidth: 2.0,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  //######End Tag#######
-
-                  const SizedBox(height: 30),
-
-                  TextButton(
-                    style: AppStyles.flatButtonStyle(),
-                    onPressed: () {
-                      Navigator.pop(context, "submit back result");
-                    },
-                    child: const Text(
-                      "Apply Filter",
-                      style: TextStyle(fontSize: 16),
                     ),
-                  ),
-                  const SizedBox(height: 30),
+                  )
                 ],
               ),
-            ),
+              const SizedBox(height: 20),
+              //######End Category#######
+
+              //######Colour#######
+              const Text(
+                "Colour",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              Stack(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(
+                        color: AppColors.hover,
+                        style: BorderStyle.solid,
+                      ),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: GridView.count(
+                      crossAxisCount: 5,
+                      mainAxisSpacing: 2,
+                      crossAxisSpacing: 2,
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      children: List.generate(colors.length, (index) {
+                        return Container(
+                          margin: const EdgeInsets.all(2),
+                          child: ColorSwatchCard(
+                            name: colors[index].getValue,
+                            slug: colors[index].getName,
+                            selected: index == selectedColorIndex,
+                            onTap: () {
+                              setState(() {
+                                selectedColorIndex = index;
+                                selected_color = colors[index].getName;
+                              });
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  Visibility(
+                    visible: loadingColors,
+                    child: const Positioned(
+                      top: 30,
+                      right: 30,
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.grey,
+                        strokeWidth: 2.0,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              //######End Colour#######
+
+              //######Price#######
+              const Text(
+                " Price",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(
+                    color: AppColors.hover,
+                    style: BorderStyle.solid,
+                  ),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    const SizedBox(height: 10),
+                    Center(
+                      child: Text(
+                        Site.CURRENCY +
+                            priceRange!.start.round().toString() +
+                            " - " +
+                            Site.CURRENCY +
+                            priceRange!.end.round().toString(),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    RangeSlider(
+                      min: 0,
+                      max: maximumPrice,
+                      values: priceRange!,
+                      divisions: 20,
+                      labels: RangeLabels(
+                        priceRange!.start.round().toString(),
+                        priceRange!.end.round().toString(),
+                      ),
+                      onChanged: (RangeValues values) {
+                        setState(() {
+                          priceRange = values;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              //######End Price#######
+
+              //######Tag#######
+              const Text(
+                " Tag",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(
+                        color: AppColors.hover,
+                        style: BorderStyle.solid,
+                      ),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: ButtonTheme(
+                      alignedDropdown: true,
+                      child: DropdownButton<Tag>(
+                        isExpanded: true,
+                        value: tags[selectedTagIndex],
+                        icon: const Icon(Icons.arrow_drop_down),
+                        items: tags.map((Tag item) {
+                          return DropdownMenuItem(
+                            value: item,
+                            child: Text(
+                                HtmlCharacterEntities.decode(item.getName)),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedTagIndex = tags.indexOf(value!);
+                            selected_tag = value.getSlug;
+                          });
+                        },
+                        underline: const SizedBox(),
+                      ),
+                    ),
+                  ),
+                  Visibility(
+                    visible: loadingTags,
+                    child: const Positioned(
+                      top: 14,
+                      right: 7,
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.grey,
+                        strokeWidth: 2.0,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              //######End Tag#######
+
+              const SizedBox(height: 30),
+
+              TextButton(
+                style: AppStyles.flatButtonStyle(),
+                onPressed: () {
+                  Navigator.pop(context, {
+                    "categories": categories,
+                    "tags": tags,
+                    "colors": colors,
+                    "price_range":
+                        (priceRange! == RangeValues(initialLower, initialUpper))
+                            ? null
+                            : priceRange,
+                    "selected_category": selected_category,
+                    "selected_tag": selected_tag,
+                    "selected_color": selected_color,
+                    "selected_cat_index": selectedCatIndex,
+                    "selected_tag_index": selectedTagIndex,
+                    "selected_color_index": selectedColorIndex,
+                  });
+                },
+                child: const Text(
+                  "Apply Filter",
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+              const SizedBox(height: 30),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

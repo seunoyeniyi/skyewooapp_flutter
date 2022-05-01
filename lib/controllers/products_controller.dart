@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 // ignore: import_of_legacy_library_into_null_safe
@@ -13,12 +14,19 @@ import 'package:skyewooapp/site.dart';
 class ProductsController extends GetxController {
   var userSession = UserSession().obs;
   var isLoading = true.obs;
+  var gotToEnd = false.obs;
   var products = <Product>[].obs;
   var messages = <String>[].obs;
   String order_by = "title menu_order";
   String paged = "1";
   int currentPaged = 1;
   String numPerPage = "40";
+
+  //filter
+  String selected_category = "";
+  String selected_tag = "";
+  String selected_color = "";
+  RangeValues? priceRange;
 
   @override
   void onInit() {
@@ -40,6 +48,7 @@ class ProductsController extends GetxController {
         products.clear();
         paged = "1";
         currentPaged = 1;
+        gotToEnd.value = false;
       }
 
       String url = Site.SIMPLE_PRODUCTS +
@@ -96,6 +105,35 @@ class ProductsController extends GetxController {
           break;
       }
 
+      if (selected_category.isNotEmpty) {
+        url += "&cat=" + selected_category;
+      }
+
+      if (selected_tag.isNotEmpty) {
+        url += "&tag=" + selected_tag;
+      }
+
+      if (selected_color.isNotEmpty) {
+        url += "&color=" + selected_color;
+      }
+
+      if (priceRange != null) {
+        url = Site.SIMPLE_PRODUCTS +
+            "?price_range=" +
+            priceRange!.start.round().toString() +
+            "|" +
+            priceRange!.end.round().toString() +
+            "&per_page=" +
+            numPerPage +
+            "&hide_description=1" +
+            "&user_id=" +
+            userSession.value.ID +
+            "&paged=" +
+            paged +
+            "&token_key=" +
+            Site.TOKEN_KEY;
+      }
+
       Response response = await get(url);
 
       if (response.statusCode == 200) {
@@ -138,21 +176,13 @@ class ProductsController extends GetxController {
         } else {
           if (products.isEmpty) {
             messages.add("No result");
-            // Toast.show(context, "No result", title: "Oops");
           } else {
-            // Toast.show(
-            //   context,
-            //   "No more result",
-            //   title: "Oops",
-            //   position: FlushbarPosition.BOTTOM,
-            //   duration: 4,
-            // );
+            gotToEnd.value = true;
             messages.add("No more result");
           }
         }
       } else {
         messages.add("Oops.. Error communication");
-        // Toast.show(context, "Oops.. Error communication", title: "Error");
       }
     } finally {
       isLoading(false);
