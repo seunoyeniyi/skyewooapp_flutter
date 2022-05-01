@@ -1,10 +1,11 @@
 // ignore_for_file: non_constant_identifier_names
 
-import 'package:flex_color_picker/flex_color_picker.dart';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:skyewooapp/app_colors.dart';
+import 'package:skyewooapp/components/swatch_card.dart';
 import 'package:skyewooapp/handlers/app_styles.dart';
-import 'package:skyewooapp/models/attribute_term.dart';
 import 'package:skyewooapp/models/category.dart';
 import 'package:skyewooapp/models/option.dart';
 import 'package:skyewooapp/models/tag.dart';
@@ -23,8 +24,8 @@ class _FilterDialogState extends State<FilterDialog> {
     Category(name: "Select a category", slug: "")
   ]; //default
   List<Tag> tags = [Tag(name: "Select a tag", slug: "")]; //default
-  List<AttributeTerm> colors = [AttributeTerm(name: "Any", slug: "")]; //default
-  List<Option> colorSwatchOptions = [Option(name: "", value: "Any")];
+  // List<AttributeTerm> sizes = [AttributeTerm(name: "Any", slug: "")]; //default for size
+  List<Option> colors = [Option(name: "", value: "Any")];
 
   //### DEAULT VALUES
   double initialLower = 100;
@@ -34,28 +35,10 @@ class _FilterDialogState extends State<FilterDialog> {
   String selected_category = "";
   int selectedTagIndex = 0;
   String selected_tag = "";
-  int selectColorIndex = 0;
+  int selectedColorIndex = 0;
   String selected_color = "";
   RangeValues priceRange = const RangeValues(100,
       13000); //shoudld have used initialLower and initialUpper, but dart won't allow
-
-  final Map<ColorSwatch<Object>, String> customSwatches =
-      <ColorSwatch<Object>, String>{
-    const MaterialColor(0xFFfae738, <int, Color>{
-      50: Color(0xFFfffee9),
-      100: Color(0xFFfff9c6),
-      200: Color(0xFFfff59f),
-      300: Color(0xFFfff178),
-      400: Color(0xFFfdec59),
-      500: Color(0xFFfae738),
-      600: Color(0xFFf3dd3d),
-      700: Color(0xFFdfc735),
-      800: Color(0xFFcbb02f),
-      900: Color(0xFFab8923),
-    }): 'Alpine',
-    ColorTools.createPrimarySwatch(const Color(0xFFBC350F)): 'Rust',
-    ColorTools.createAccentSwatch(const Color(0xFFB062DB)): 'Lavender',
-  };
 
   @override
   void initState() {
@@ -196,7 +179,6 @@ class _FilterDialogState extends State<FilterDialog> {
                       )
                     ],
                   ),
-
                   const SizedBox(height: 20),
                   //######End Category#######
 
@@ -206,30 +188,52 @@ class _FilterDialogState extends State<FilterDialog> {
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(
-                        color: AppColors.hover,
-                        style: BorderStyle.solid,
+                  Stack(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                            color: AppColors.hover,
+                            style: BorderStyle.solid,
+                          ),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: GridView.count(
+                          crossAxisCount: 5,
+                          mainAxisSpacing: 5,
+                          crossAxisSpacing: 3,
+                          shrinkWrap: true,
+                          scrollDirection: Axis.vertical,
+                          children: List.generate(colors.length, (index) {
+                            return SwatchCard(
+                              name: colors[index].getValue,
+                              slug: colors[index].getName,
+                              selected: index == selectedColorIndex,
+                              onTap: () {
+                                setState(() {
+                                  selectedColorIndex = index;
+                                });
+                              },
+                            );
+                          }).toList(),
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Center(
-                      child: ColorPicker(
-                        onColorChanged: (Color color) {},
-                        customColorSwatchesAndNames: customSwatches,
-                        enableShadesSelection: false,
-                        pickersEnabled: const <ColorPickerType, bool>{
-                          ColorPickerType.both: false,
-                          ColorPickerType.primary: false,
-                          ColorPickerType.accent: false,
-                          ColorPickerType.bw: false,
-                          ColorPickerType.custom: true,
-                          ColorPickerType.wheel: false,
-                        },
+                      Visibility(
+                        visible: colors.length < 2,
+                        child: const Positioned(
+                          top: 30,
+                          right: 30,
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.grey,
+                            strokeWidth: 2.0,
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                   const SizedBox(height: 20),
                   //######End Colour#######
@@ -338,7 +342,7 @@ class _FilterDialogState extends State<FilterDialog> {
                             strokeWidth: 2.0,
                           ),
                         ),
-                      )
+                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
