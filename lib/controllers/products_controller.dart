@@ -8,7 +8,7 @@ import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:http/http.dart';
 import 'package:skyewooapp/handlers/user_session.dart';
-import 'package:skyewooapp/models/products.dart';
+import 'package:skyewooapp/models/product.dart';
 import 'package:skyewooapp/site.dart';
 
 class ProductsController extends GetxController {

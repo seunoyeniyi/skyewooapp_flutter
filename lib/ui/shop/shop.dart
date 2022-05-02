@@ -13,8 +13,10 @@ import 'package:skyewooapp/handlers/handlers.dart';
 import 'package:skyewooapp/main.dart';
 import 'package:skyewooapp/models/category.dart';
 import 'package:skyewooapp/models/option.dart';
+import 'package:skyewooapp/models/product.dart';
 import 'package:skyewooapp/models/tag.dart';
 import 'package:skyewooapp/ui/filter_dialog.dart';
+import 'package:skyewooapp/ui/product/product_page.dart';
 
 class ShopBody extends StatefulWidget {
   const ShopBody({Key? key})
@@ -233,6 +235,24 @@ class _ShopBodyState extends State<ShopBody> {
                 inWishlist: (productsController.products[index].getInWishList ==
                     "true"),
                 discountValue: (discount > 0) ? discount.toString() : "0",
+                onPressed: ({bool? inWishlist}) {
+                  //product
+                  Product product = productsController.products[index];
+                  //if wishlist was updated
+                  if (inWishlist != null) {
+                    product.setInWishList = inWishlist.toString();
+                  }
+                  //push
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProductPage(product: product),
+                    ),
+                  ).then((dynamic result) {
+                    //refresh necessary UIs
+                    MyHomePage.resetAppBar(context);
+                  });
+                },
               );
             }),
           ),
@@ -266,13 +286,9 @@ class _ShopBodyState extends State<ShopBody> {
         !_scrollController.position.outOfRange &&
         !productsController.isLoading.value &&
         !productsController.gotToEnd.value) {
-      // log("Loading more " + productsController.paged);
       if (!productsController.isLoading.value) {
-        // currentPaged = currentPaged + 1;
-        // paged = currentPaged.toString();
-        // fetchProducts();
-        productsController.paged =
-            (productsController.currentPaged + 1).toString();
+        productsController.currentPaged = productsController.currentPaged + 1;
+        productsController.paged = productsController.currentPaged.toString();
         productsController.fetchProducts();
       }
     }

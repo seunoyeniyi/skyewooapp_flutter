@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:skyewooapp/app_colors.dart';
+import 'package:skyewooapp/models/product.dart';
 import 'package:skyewooapp/ui/home/home.dart';
 import 'package:skyewooapp/screens/login/login_screen.dart';
 import 'package:skyewooapp/screens/signup/signup_screen.dart';
 import 'package:skyewooapp/screens/welcome/welcome_screen.dart';
 import 'package:skyewooapp/ui/app_bar.dart';
 import 'package:skyewooapp/ui/app_drawer.dart';
+import 'package:skyewooapp/ui/product/product_page.dart';
 import 'package:skyewooapp/ui/shop/shop.dart';
 
 void main() {
@@ -34,6 +36,7 @@ class MyApp extends StatelessWidget {
         "welcome": (BuildContext context) => const WelcomeScreen(),
         "login": (BuildContext context) => const LoginScreen(),
         "register": (BuildContext context) => const SignUpScreen(),
+        "product": (BuildContext context) => ProductPage(product: Product()),
       },
     );
   }
@@ -67,6 +70,10 @@ class MyHomePage extends StatefulWidget {
 
   static void showSearchBar(BuildContext context) {
     context.findAncestorStateOfType<_MyHomePageState>()!.showSearchBar();
+  }
+
+  static void resetAppBar(BuildContext context) {
+    context.findAncestorStateOfType<_MyHomePageState>()!.resetAppBar();
   }
 
   //END STATIC FUNCTIONS
@@ -131,6 +138,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void showSearchBar() {
     if (appBarController.displaySearch != null) {
       appBarController.displaySearch!();
+    }
+  }
+
+  void resetAppBar() {
+    if (appBarController.refreshAll != null) {
+      appBarController.refreshAll!();
     }
   }
 }

@@ -25,6 +25,7 @@ class ProductCard extends StatefulWidget {
     required this.price,
     required this.inWishlist,
     required this.discountValue,
+    required this.onPressed,
   }) : super(key: key);
 
   final UserSession userSession;
@@ -35,6 +36,7 @@ class ProductCard extends StatefulWidget {
   final String price;
   final bool inWishlist;
   final String discountValue;
+  final Function({bool inWishlist}) onPressed;
 
   @override
   State<ProductCard> createState() => _ProductCardState();
@@ -71,7 +73,7 @@ class _ProductCardState extends State<ProductCard> {
             onPrimary: AppColors.hover,
             shadowColor: Colors.transparent,
           ),
-          onPressed: () => {},
+          onPressed: () => widget.onPressed(inWishlist: inWishlist),
           child: Column(
             children: [
               Container(
@@ -168,6 +170,7 @@ class _ProductCardState extends State<ProductCard> {
             ],
           ),
         ),
+        //wishlist button
         Positioned(
           right: 0,
           top: 120,
@@ -199,6 +202,7 @@ class _ProductCardState extends State<ProductCard> {
             ),
           ),
         ),
+        //discount lable
         Positioned(
           left: 10,
           top: 10,

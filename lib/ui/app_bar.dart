@@ -29,6 +29,10 @@ class _AppAppBarState extends State<AppAppBar> {
   bool showWishlistBadge = false;
 
   init() async {
+    refreshAll();
+  }
+
+  refreshAll() async {
     await userSession.init();
     cartCount = userSession.last_cart_count;
     showCartCount = (int.parse(cartCount) > 0);
@@ -45,6 +49,7 @@ class _AppAppBarState extends State<AppAppBar> {
     widget.controller.updateWishlistBadge = updateWishlistBadge;
     widget.controller.updateCartCount = updateCartCount;
     widget.controller.displaySearch = displaySearch;
+    widget.controller.refreshAll = refreshAll;
 
     init();
     super.initState();
@@ -162,4 +167,5 @@ class AppAppBarController {
   void Function(String)? updateWishlistBadge;
   void Function(String)? updateCartCount;
   void Function()? displaySearch;
+  void Function()? refreshAll;
 }
