@@ -228,6 +228,7 @@ class _ShopBodyState extends State<ShopBody> {
                 userSession: productsController.userSession.value,
                 productID: productsController.products[index].getID,
                 productTitle: productsController.products[index].getName,
+                productType: productsController.products[index].getProductType,
                 image: productsController.products[index].getImage,
                 regularPrice:
                     productsController.products[index].getRegularPrice,

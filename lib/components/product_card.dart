@@ -20,6 +20,7 @@ class ProductCard extends StatefulWidget {
     required this.userSession,
     required this.productID,
     required this.productTitle,
+    required this.productType,
     required this.image,
     required this.regularPrice,
     required this.price,
@@ -31,6 +32,7 @@ class ProductCard extends StatefulWidget {
   final UserSession userSession;
   final String productID;
   final String productTitle;
+  final String productType;
   final String image;
   final String regularPrice;
   final String price;
@@ -142,7 +144,8 @@ class _ProductCardState extends State<ProductCard> {
                         Visibility(
                           visible: (widget.regularPrice.isNotEmpty &&
                               widget.regularPrice != "0" &&
-                              isNumeric(widget.regularPrice)),
+                              isNumeric(widget.regularPrice) &&
+                              widget.productType != "variable"),
                           child: Text(
                             Site.CURRENCY +
                                 Formatter.format(widget.regularPrice),
@@ -155,7 +158,16 @@ class _ProductCardState extends State<ProductCard> {
                         ),
                         const SizedBox(width: 2),
                         Text(
-                          Site.CURRENCY + Formatter.format(widget.price),
+                          (() {
+                            if (widget.productType == "variable") {
+                              return "From " +
+                                  Site.CURRENCY +
+                                  Formatter.format(widget.price);
+                            } else {
+                              return Site.CURRENCY +
+                                  Formatter.format(widget.price);
+                            }
+                          }()),
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 13,

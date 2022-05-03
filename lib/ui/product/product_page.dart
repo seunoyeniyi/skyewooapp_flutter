@@ -1,18 +1,24 @@
+import 'dart:convert';
+
 import 'package:badges/badges.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cart_stepper/cart_stepper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:skyewooapp/app_colors.dart';
+import 'package:skyewooapp/handlers/formatter.dart';
 import 'package:skyewooapp/handlers/handlers.dart';
 import 'package:skyewooapp/handlers/user_session.dart';
 import 'package:skyewooapp/handlers/wishlist.dart';
 import 'package:skyewooapp/models/product.dart';
+import 'package:skyewooapp/site.dart';
 
 class ProductPage extends StatefulWidget {
   const ProductPage({
@@ -44,17 +50,33 @@ class _ProductPageState extends State<ProductPage> {
   };
   String selectedSegment = "product";
 
+  bool isLoading = true;
+  bool tryAgain = false;
+
+  //ALL PRODUCT DETAILS
+  String description = "";
+  String cartProductID = "0";
+  String productPrice = "0";
+  bool priceAvailable = false;
+  bool isVariable = false;
+  //END PRODUCT DETAILS
+
   init() async {
     await userSession.init();
     cartCount = userSession.last_cart_count;
     showCartCount = (int.parse(cartCount) > 0);
     setState(() {});
+    fetchDetails();
   }
 
   @override
   void initState() {
     product = widget.product;
     inWishlist = product.getInWishList == "true";
+    cartProductID = product.getID; //parent ID first
+    productPrice = product.getPrice;
+    isVariable = product.getProductType == "variable";
+    priceAvailable = !isVariable;
 
     if (product.getID.isEmpty || product.getID == "0") {
       Toaster.show(message: "No product selected.");
@@ -251,11 +273,90 @@ class _ProductPageState extends State<ProductPage> {
                   Visibility(
                     visible: selectedSegment == "product",
                     child: Container(
-                      margin: const EdgeInsets.only(left: 10, right: 10),
-                      color: Colors.white,
-                      padding: const EdgeInsets.all(30),
-                      child: const Center(
-                        child: Text("Product"),
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          //CART OPTION CONTAINER
+                          Container(
+                            color: Colors.white,
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                //loading
+                                Visibility(
+                                  visible: isLoading,
+                                  child: const Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: SizedBox(
+                                        height: 30,
+                                        width: 30,
+                                        child: CircularProgressIndicator(
+                                          color: AppColors.hover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                //option
+                                Visibility(
+                                  visible: !isLoading && !tryAgain,
+                                  child: Column(
+                                    children: [
+                                      //price
+                                      Visibility(
+                                        visible: priceAvailable,
+                                        child: Center(
+                                          child: Text(
+                                            Site.CURRENCY +
+                                                Formatter.format(productPrice),
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 24,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: isVariable,
+                                        child: const Text(
+                                            "Show custom variations selectors"),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                //refresh
+                                Visibility(
+                                  visible: tryAgain,
+                                  child: Center(
+                                    child: ElevatedButton(
+                                      child: const Text("Try Again"),
+                                      onPressed: () => fetchDetails(),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          //DESCRIPTON CONTAINER
+                          const SizedBox(height: 10),
+                          Visibility(
+                            visible: !isLoading &&
+                                description.isNotEmpty &&
+                                !tryAgain,
+                            child: Container(
+                                color: Colors.white,
+                                padding: const EdgeInsets.all(10),
+                                child: Html(
+                                  data: description,
+                                  defaultTextStyle: const TextStyle(
+                                    fontSize: 11,
+                                  ),
+                                )),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -265,9 +366,38 @@ class _ProductPageState extends State<ProductPage> {
                     child: Container(
                       margin: const EdgeInsets.only(left: 10, right: 10),
                       color: Colors.white,
-                      padding: const EdgeInsets.all(30),
-                      child: const Center(
-                        child: Text("Reviews"),
+                      padding: const EdgeInsets.all(10),
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          //loading
+                          Visibility(
+                            visible: isLoading,
+                            child: const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: SizedBox(
+                                  height: 30,
+                                  width: 30,
+                                  child: CircularProgressIndicator(
+                                    color: AppColors.hover,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          //refresh
+                          Visibility(
+                            visible: tryAgain,
+                            child: Center(
+                              child: ElevatedButton(
+                                child: const Text("Try Again"),
+                                onPressed: () => fetchDetails(),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -277,11 +407,47 @@ class _ProductPageState extends State<ProductPage> {
                     child: Container(
                       margin: const EdgeInsets.only(left: 10, right: 10),
                       color: Colors.white,
-                      padding: const EdgeInsets.all(30),
-                      child: const Center(
-                        child: Text("Size Chart"),
+                      padding: const EdgeInsets.all(10),
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          //loading
+                          Visibility(
+                            visible: isLoading,
+                            child: const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: SizedBox(
+                                  height: 30,
+                                  width: 30,
+                                  child: CircularProgressIndicator(
+                                    color: AppColors.hover,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          //refresh
+                          Visibility(
+                            visible: tryAgain,
+                            child: Center(
+                              child: ElevatedButton(
+                                child: const Text("Try Again"),
+                                onPressed: () => fetchDetails(),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    color: Colors.white,
+                    padding: const EdgeInsets.only(top: 10, bottom: 10),
+                    margin: const EdgeInsets.only(left: 10, right: 10),
+                    child: Image.asset("assets/images/on_every_product.png"),
                   ),
                   const SizedBox(height: 40),
                 ],
@@ -366,6 +532,44 @@ class _ProductPageState extends State<ProductPage> {
       Toaster.show(message: "Coudn't update wishlist.");
     }
 
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  fetchDetails() async {
+    try {
+      setState(() {
+        isLoading = true;
+        tryAgain = false;
+      });
+      //fetch
+      String url = Site.PRODUCT +
+          product.getID +
+          "?user_id=" +
+          userSession.ID +
+          Site.TOKEN_KEY_APPEND;
+
+      Response response = await get(url);
+
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
+        Map<String, dynamic> json = jsonDecode(response.body);
+
+        description =
+            (json["short_description"] ?? json["description"]).toString();
+        if (description == "null") {
+          description = "";
+        }
+      } else {
+        Toaster.show(message: "Unable to get product.");
+        tryAgain = true;
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 }
