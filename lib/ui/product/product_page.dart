@@ -1,14 +1,14 @@
-// ignore: import_of_legacy_library_into_null_safe
 import 'package:badges/badges.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cart_stepper/cart_stepper.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:skyewooapp/app_colors.dart';
-import 'package:skyewooapp/handlers/app_styles.dart';
 import 'package:skyewooapp/handlers/handlers.dart';
 import 'package:skyewooapp/handlers/user_session.dart';
 import 'package:skyewooapp/handlers/wishlist.dart';
@@ -38,6 +38,12 @@ class _ProductPageState extends State<ProductPage> {
 
   int _quantity = 1;
 
+  Map<String, Widget> segments = {
+    "product": const Text("PRODUCT"),
+    "reviews": const Text("REVIEWS"),
+  };
+  String selectedSegment = "product";
+
   init() async {
     await userSession.init();
     cartCount = userSession.last_cart_count;
@@ -63,164 +69,226 @@ class _ProductPageState extends State<ProductPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            SliverAppBar(
-              pinned: true,
-              snap: false,
-              floating: false,
-              expandedHeight: 400.0,
-              stretch: true,
-              flexibleSpace: LayoutBuilder(
-                builder: (BuildContext context, BoxConstraints constraints) {
-                  showSliverTitle = (constraints.biggest.height < 120);
-                  return FlexibleSpaceBar(
-                    collapseMode: CollapseMode.pin,
-                    title: Visibility(
-                      visible: showSliverTitle,
-                      child: Text(
-                        product.getName.length > 18
-                            ? product.getName.substring(0, 18) + "..."
-                            : product.getName,
-                        style: const TextStyle(color: Colors.black),
-                      ),
-                    ),
-                    background: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        FittedBox(
-                          fit: BoxFit.cover,
-                          child: (() {
-                            if (product.getImage.isNotEmpty &&
-                                product.getImage != "false" &&
-                                Uri.parse(product.getImage).isAbsolute) {
-                              return Container(
-                                color: AppColors.f1,
-                                child: CachedNetworkImage(
-                                  imageUrl: product.getImage,
-                                  placeholder: (context, url) =>
-                                      Shimmer.fromColors(
-                                    baseColor: AppColors.f1,
-                                    highlightColor: Colors.white,
-                                    period: const Duration(milliseconds: 500),
-                                    child: Container(
-                                      color: AppColors.hover,
-                                    ),
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      Container(
-                                    color: AppColors.f1,
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(80.0),
-                                      child: Icon(Icons.error),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            } else {
-                              return Container(
-                                color: AppColors.f1,
-                                child: const Padding(
-                                  padding: EdgeInsets.all(80.0),
-                                  child: Icon(Icons.error),
-                                ),
-                              );
-                            }
-                          }()),
-                        ),
-
-                        //wishlist button
-                        Positioned(
-                          right: 10,
-                          bottom: 10,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                if (inWishlist) {
-                                  updateWishlist(product.getID, "remove");
-                                } else {
-                                  updateWishlist(product.getID, "add");
-                                }
-                                inWishlist =
-                                    !inWishlist; //to change icon immediately
-                              });
-                            },
-                            child: SvgPicture.asset(
-                              (inWishlist)
-                                  ? "assets/icons/icons8_heart.svg"
-                                  : "assets/icons/icons8_heart_outline.svg",
-                              width: 30,
-                              height: 30,
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: Size.zero,
-                              shape: const CircleBorder(),
-                              padding: const EdgeInsets.only(
-                                  left: 6, right: 6, top: 8, bottom: 6),
-                              primary: Colors.white, // <-- Button color
-                              onPrimary: AppColors.black, // <-- Splash color
-                              elevation: 5,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-              actions: [
-                IconButton(
-                  onPressed: () {},
-                  icon: Badge(
-                    position: BadgePosition.topEnd(top: -8, end: -4),
-                    showBadge: showCartCount,
-                    padding: const EdgeInsets.all(5),
-                    badgeContent: Text(
-                      cartCount,
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                    badgeColor: AppColors.primary,
-                    child: SvgPicture.asset(
-                      "assets/icons/icons8_shopping_bag.svg",
-                      height: 25,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            snap: false,
+            floating: false,
+            expandedHeight: 400.0,
+            stretch: true,
+            flexibleSpace: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                showSliverTitle = (constraints.biggest.height < 120);
+                return FlexibleSpaceBar(
+                  collapseMode: CollapseMode.pin,
+                  title: Visibility(
+                    visible: showSliverTitle,
+                    child: Text(
+                      product.getName.length > 18
+                          ? product.getName.substring(0, 18) + "..."
+                          : product.getName,
+                      style: const TextStyle(color: Colors.black),
                     ),
                   ),
-                ),
-              ],
+                  background: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      FittedBox(
+                        fit: BoxFit.cover,
+                        child: (() {
+                          if (product.getImage.isNotEmpty &&
+                              product.getImage != "false" &&
+                              Uri.parse(product.getImage).isAbsolute) {
+                            return Container(
+                              color: AppColors.f1,
+                              child: CachedNetworkImage(
+                                imageUrl: product.getImage,
+                                placeholder: (context, url) =>
+                                    Shimmer.fromColors(
+                                  baseColor: AppColors.f1,
+                                  highlightColor: Colors.white,
+                                  period: const Duration(milliseconds: 500),
+                                  child: Container(
+                                    color: AppColors.hover,
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) => Container(
+                                  color: AppColors.f1,
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(80.0),
+                                    child: Icon(Icons.error),
+                                  ),
+                                ),
+                              ),
+                            );
+                          } else {
+                            return Container(
+                              color: AppColors.f1,
+                              child: const Padding(
+                                padding: EdgeInsets.all(80.0),
+                                child: Icon(Icons.error),
+                              ),
+                            );
+                          }
+                        }()),
+                      ),
+
+                      //wishlist button
+                      Positioned(
+                        right: 10,
+                        bottom: 10,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              if (inWishlist) {
+                                updateWishlist(product.getID, "remove");
+                              } else {
+                                updateWishlist(product.getID, "add");
+                              }
+                              inWishlist =
+                                  !inWishlist; //to change icon immediately
+                            });
+                          },
+                          child: SvgPicture.asset(
+                            (inWishlist)
+                                ? "assets/icons/icons8_heart.svg"
+                                : "assets/icons/icons8_heart_outline.svg",
+                            width: 30,
+                            height: 30,
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: Size.zero,
+                            shape: const CircleBorder(),
+                            padding: const EdgeInsets.only(
+                                left: 6, right: 6, top: 8, bottom: 6),
+                            primary: Colors.white, // <-- Button color
+                            onPrimary: AppColors.black, // <-- Splash color
+                            elevation: 5,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
-          ];
-        },
-        body: Container(
-          color: Colors.white,
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                product.getName,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+            actions: [
+              IconButton(
+                onPressed: () {},
+                icon: Badge(
+                  position: BadgePosition.topEnd(top: -8, end: -4),
+                  showBadge: showCartCount,
+                  padding: const EdgeInsets.all(5),
+                  badgeContent: Text(
+                    cartCount,
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                  badgeColor: AppColors.primary,
+                  child: SvgPicture.asset(
+                    "assets/icons/icons8_shopping_bag.svg",
+                    height: 25,
+                  ),
                 ),
               ),
-              const SizedBox(height: 10),
-              Container(
-                color: AppColors.primary,
-                padding: const EdgeInsets.only(
-                  left: 10,
-                  right: 10,
-                  top: 5,
-                  bottom: 5,
-                ),
-                child: const Text(
-                  "Category",
-                  style: TextStyle(color: AppColors.onPrimary),
-                ),
-              )
             ],
           ),
-        ),
+          SliverToBoxAdapter(
+            child: Container(
+              color: AppColors.f1,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    width: double.infinity,
+                    color: Colors.white,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          product.getName,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Container(
+                          color: AppColors.primary,
+                          padding: const EdgeInsets.only(
+                            left: 10,
+                            right: 10,
+                            top: 5,
+                            bottom: 5,
+                          ),
+                          child: const Text(
+                            "Category",
+                            style: TextStyle(color: AppColors.onPrimary),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    width: double.infinity,
+                    child: CupertinoSegmentedControl(
+                      padding: const EdgeInsets.all(0),
+                      children: segments,
+                      groupValue: selectedSegment,
+                      onValueChanged: (String value) {
+                        setState(() {
+                          selectedSegment = value;
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  //PRODUCT/DETAILS Container
+                  Visibility(
+                    visible: selectedSegment == "product",
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 10, right: 10),
+                      color: Colors.white,
+                      padding: const EdgeInsets.all(30),
+                      child: const Center(
+                        child: Text("Product"),
+                      ),
+                    ),
+                  ),
+                  //REVIEWS Container
+                  Visibility(
+                    visible: selectedSegment == "reviews",
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 10, right: 10),
+                      color: Colors.white,
+                      padding: const EdgeInsets.all(30),
+                      child: const Center(
+                        child: Text("Reviews"),
+                      ),
+                    ),
+                  ),
+                  //SIZE CHART Container
+                  Visibility(
+                    visible: selectedSegment == "size_chart",
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 10, right: 10),
+                      color: Colors.white,
+                      padding: const EdgeInsets.all(30),
+                      child: const Center(
+                        child: Text("Size Chart"),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: BottomAppBar(
         child: Padding(
