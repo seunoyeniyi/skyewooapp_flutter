@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:badges/badges.dart';
 // ignore: import_of_legacy_library_into_null_safe
@@ -7,18 +8,27 @@ import 'package:cart_stepper/cart_stepper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:html_character_entities/html_character_entities.dart';
 import 'package:http/http.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:skyewooapp/app_colors.dart';
+import 'package:skyewooapp/components/attributes/attributes_selector.dart';
+import 'package:skyewooapp/components/loading_box.dart';
+import 'package:skyewooapp/handlers/cart.dart';
 import 'package:skyewooapp/handlers/formatter.dart';
 import 'package:skyewooapp/handlers/handlers.dart';
 import 'package:skyewooapp/handlers/user_session.dart';
 import 'package:skyewooapp/handlers/wishlist.dart';
+import 'package:skyewooapp/models/attribute.dart';
+import 'package:skyewooapp/models/comment.dart';
+import 'package:skyewooapp/models/option.dart';
 import 'package:skyewooapp/models/product.dart';
 import 'package:skyewooapp/site.dart';
+import 'package:skyewooapp/ui/product/reviews.dart';
 
 class ProductPage extends StatefulWidget {
   const ProductPage({
@@ -59,6 +69,14 @@ class _ProductPageState extends State<ProductPage> {
   String productPrice = "0";
   bool priceAvailable = false;
   bool isVariable = false;
+  String categoryName = "Category";
+  String categorySlug = "";
+  List<Attribute> attributes = [];
+  List<Map<String, dynamic>> variations = [];
+  bool haveReviews = false;
+  double averageRating = 0;
+  int reviewsCount = 0;
+  List<Comment> comments = [];
   //END PRODUCT DETAILS
 
   init() async {
@@ -236,20 +254,23 @@ class _ProductPageState extends State<ProductPage> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        Container(
-                          color: AppColors.primary,
-                          padding: const EdgeInsets.only(
-                            left: 10,
-                            right: 10,
-                            top: 5,
-                            bottom: 5,
-                          ),
-                          child: const Text(
-                            "Category",
-                            style: TextStyle(color: AppColors.onPrimary),
+                        InkWell(
+                          onTap: () {},
+                          child: Container(
+                            color: AppColors.primary,
+                            padding: const EdgeInsets.only(
+                              left: 10,
+                              right: 10,
+                              top: 5,
+                              bottom: 5,
+                            ),
+                            child: Text(
+                              HtmlCharacterEntities.decode(categoryName),
+                              style:
+                                  const TextStyle(color: AppColors.onPrimary),
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 10),
                       ],
                     ),
                   ),
@@ -268,12 +289,12 @@ class _ProductPageState extends State<ProductPage> {
                       },
                     ),
                   ),
-                  const SizedBox(height: 10),
                   //PRODUCT/DETAILS Container
                   Visibility(
                     visible: selectedSegment == "product",
                     child: Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.only(
+                          left: 10, right: 10, bottom: 0, top: 10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -319,10 +340,25 @@ class _ProductPageState extends State<ProductPage> {
                                           ),
                                         ),
                                       ),
+                                      //attribute
                                       Visibility(
                                         visible: isVariable,
-                                        child: const Text(
-                                            "Show custom variations selectors"),
+                                        child: AttributesSelector(
+                                          attributes: attributes,
+                                          variations: variations,
+                                          onChanged: (bool found,
+                                              String productID, String price) {
+                                            setState(() {
+                                              priceAvailable = found;
+                                              productPrice = price;
+                                              if (found) {
+                                                cartProductID = productID;
+                                              } else {
+                                                cartProductID = product.getID;
+                                              }
+                                            });
+                                          },
+                                        ),
                                       )
                                     ],
                                   ),
@@ -341,20 +377,25 @@ class _ProductPageState extends State<ProductPage> {
                             ),
                           ),
                           //DESCRIPTON CONTAINER
-                          const SizedBox(height: 10),
+
                           Visibility(
                             visible: !isLoading &&
                                 description.isNotEmpty &&
                                 !tryAgain,
-                            child: Container(
-                                color: Colors.white,
-                                padding: const EdgeInsets.all(10),
-                                child: Html(
-                                  data: description,
-                                  defaultTextStyle: const TextStyle(
-                                    fontSize: 11,
-                                  ),
-                                )),
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 10),
+                                Container(
+                                    color: Colors.white,
+                                    padding: const EdgeInsets.all(10),
+                                    child: Html(
+                                      data: description,
+                                      defaultTextStyle: const TextStyle(
+                                        fontSize: 11,
+                                      ),
+                                    )),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -364,7 +405,8 @@ class _ProductPageState extends State<ProductPage> {
                   Visibility(
                     visible: selectedSegment == "reviews",
                     child: Container(
-                      margin: const EdgeInsets.only(left: 10, right: 10),
+                      margin:
+                          const EdgeInsets.only(top: 10, left: 10, right: 10),
                       color: Colors.white,
                       padding: const EdgeInsets.all(10),
                       width: double.infinity,
@@ -387,6 +429,16 @@ class _ProductPageState extends State<ProductPage> {
                               ),
                             ),
                           ),
+                          //Reviews
+                          Visibility(
+                            visible: !isLoading,
+                            child: Reviews(
+                              haveReviews: haveReviews,
+                              averageRating: averageRating,
+                              reviewsCount: reviewsCount,
+                              comments: comments,
+                            ),
+                          ),
                           //refresh
                           Visibility(
                             visible: tryAgain,
@@ -405,7 +457,8 @@ class _ProductPageState extends State<ProductPage> {
                   Visibility(
                     visible: selectedSegment == "size_chart",
                     child: Container(
-                      margin: const EdgeInsets.only(left: 10, right: 10),
+                      margin:
+                          const EdgeInsets.only(top: 10, left: 10, right: 10),
                       color: Colors.white,
                       padding: const EdgeInsets.all(10),
                       width: double.infinity,
@@ -479,7 +532,9 @@ class _ProductPageState extends State<ProductPage> {
               const SizedBox(width: 10),
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    addToCart();
+                  },
                   icon: SvgPicture.asset(
                     "assets/icons/icons8_shopping_bag.svg",
                     color: AppColors.onPrimary,
@@ -555,11 +610,70 @@ class _ProductPageState extends State<ProductPage> {
       if (response.statusCode == 200 && response.body.isNotEmpty) {
         Map<String, dynamic> json = jsonDecode(response.body);
 
+        //############## DESCRIPTION #####################
         description =
             (json["short_description"] ?? json["description"]).toString();
         if (description == "null") {
           description = "";
         }
+        //################ END DESCRIPTION ##################
+
+        //############## CATEGORY NAME #####################
+        List<Map<String, dynamic>> categories = List.from(json["categories"]);
+        if (categories.isNotEmpty) {
+          Map<String, dynamic> category = categories[0];
+          categoryName = category["name"].toString();
+          categorySlug = category["slug"].toString(); //for onclick of the label
+        }
+        //############## END CATEGRY NAME #####################
+
+        //############### ATTRIBUTES and VARIATIONS ####################
+        if (json["type"].toString() == "variable" ||
+            json["product_type"].toString() == "variable") {
+          variations = List.from(json["variations"]);
+          List<Map<String, dynamic>> attrs = List.from(json["attributes"]);
+
+          //for each attributes
+          for (var attribute in attrs) {
+            //get each attribute options
+            List<Map<String, dynamic>> jsonOptions =
+                List.from(attribute["options"]);
+            List<Option> option = [];
+            //for each of the options
+            for (var opt in jsonOptions) {
+              option.add(Option(
+                name: opt["name"].toString(),
+                value: opt["value"].toString(),
+              ));
+            }
+            //add the options, name, and label to the global attributes;
+            attributes.add(Attribute(
+              name: attribute["name"].toString(),
+              label: attribute["label"].toString(),
+              options: option,
+            ));
+          }
+        }
+        //##################### END ATTRIBUTES and VARIATIONS #######################
+
+        //################## RATING AND REVIEWS ###################
+        List<Map<String, dynamic>> jsonComments = List.from(json["comments"]);
+        if (jsonComments.isNotEmpty) {
+          haveReviews = true;
+          averageRating = double.parse(json["average_rating"].toString());
+          reviewsCount = int.parse(json["review_count"].toString());
+        }
+
+        for (var comment in jsonComments) {
+          comments.add(Comment(
+            username: comment["comment_author"].toString(),
+            comment: comment["comment_content"].toString(),
+            rating: comment["rating"].toString(),
+            userImage: comment["user_image"].toString(),
+          ));
+        }
+
+        //################ END RATING AND REVIEWS #######################
       } else {
         Toaster.show(message: "Unable to get product.");
         tryAgain = true;
@@ -571,5 +685,39 @@ class _ProductPageState extends State<ProductPage> {
         });
       }
     }
+  }
+
+  addToCart() async {
+    Cart cart = Cart(userSession: userSession);
+    if (priceAvailable && cartProductID != "0") {
+      SmartDialog.showLoading(
+          widget: const LoadingBox(
+        text: "Adding to cart...",
+      ));
+
+      Map<String, dynamic> result =
+          await cart.addToCart(productID: cartProductID, quantity: _quantity);
+
+      if (result["status"] == "success") {
+        setState(() {
+          cartCount = result["contents_count"].toString();
+        });
+        Toaster.showIcon(
+          message: "Product added to cart",
+          icon: Icons.check,
+          context: context,
+          gravity: ToastGravity.TOP,
+          duration: 3,
+        );
+      } else {
+        ToastBar.show(context, result["message"].toString());
+      }
+    } else {
+      Toaster.show(
+        message: "Please select product option.",
+        gravity: ToastGravity.CENTER,
+      );
+    }
+    SmartDialog.dismiss();
   }
 }

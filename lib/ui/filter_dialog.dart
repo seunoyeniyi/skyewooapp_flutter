@@ -204,7 +204,7 @@ class _FilterDialogState extends State<FilterDialog> {
                             ),
                           );
                         }).toList(),
-                        onChanged: (value) {
+                        onChanged: (Category? value) {
                           setState(() {
                             selectedCatIndex = categories.indexOf(value!);
                             selected_category = value.getSlug;
@@ -255,7 +255,7 @@ class _FilterDialogState extends State<FilterDialog> {
                       mainAxisSpacing: 2,
                       crossAxisSpacing: 2,
                       shrinkWrap: true,
-                      scrollDirection: Axis.vertical,
+                      physics: const NeverScrollableScrollPhysics(),
                       children: List.generate(colors.length, (index) {
                         return Container(
                           margin: const EdgeInsets.all(2),
@@ -375,7 +375,7 @@ class _FilterDialogState extends State<FilterDialog> {
                                 HtmlCharacterEntities.decode(item.getName)),
                           );
                         }).toList(),
-                        onChanged: (value) {
+                        onChanged: (Tag? value) {
                           setState(() {
                             selectedTagIndex = tags.indexOf(value!);
                             selected_tag = value.getSlug;

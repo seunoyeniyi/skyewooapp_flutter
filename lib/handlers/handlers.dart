@@ -29,13 +29,54 @@ class Toaster {
     double fontSize = 16.0,
   }) {
     Fluttertoast.showToast(
-        msg: message,
-        toastLength: length,
-        gravity: gravity,
-        timeInSecForIosWeb: 1,
-        backgroundColor: background,
-        textColor: textColor,
-        fontSize: fontSize);
+      msg: message,
+      toastLength: length,
+      gravity: gravity,
+      timeInSecForIosWeb: 1,
+      backgroundColor: background,
+      textColor: textColor,
+      fontSize: fontSize,
+    );
+  }
+
+  static void showIcon({
+    required String message,
+    required IconData icon,
+    required BuildContext context,
+    ToastGravity gravity = ToastGravity.BOTTOM,
+    int duration = 2,
+    Color background = AppColors.primary,
+    Color textColor = AppColors.onPrimary,
+    double fontSize = 16.0,
+    EdgeInsetsGeometry padding =
+        const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+    double radius = 25.0,
+  }) {
+    FToast fToast = FToast(context);
+    Widget toast = Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(radius),
+        color: background,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: textColor),
+          const SizedBox(width: 12.0),
+          Text(message,
+              style: TextStyle(
+                color: textColor,
+                fontSize: fontSize,
+              )),
+        ],
+      ),
+    );
+    fToast.showToast(
+      child: toast,
+      gravity: gravity,
+      toastDuration: Duration(seconds: duration),
+    );
   }
 }
 
@@ -47,4 +88,10 @@ class AppRoute {
 
 bool isNumeric(String str) {
   return double.tryParse(str) != null;
+}
+
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
+  }
 }

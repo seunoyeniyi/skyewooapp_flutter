@@ -43,6 +43,7 @@ dependencies:
   get: ^4.6.1
   dotted_border: ^2.0.0+2
   cart_stepper: ^2.0.2
+  flutter_rating_bar: ^4.0.0
 
 
   # The following adds the Cupertino Icons font to your application.
