@@ -1,33 +1,40 @@
-// ignore_for_file: non_constant_identifier_names
-
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:get/get.dart' hide Response;
+import 'package:get/get.dart';
 import 'package:skyewooapp/app_colors.dart';
 import 'package:skyewooapp/components/product_card.dart';
 import 'package:skyewooapp/components/shimmer_product_card.dart';
 import 'package:skyewooapp/components/shimmer_shop.dart';
 import 'package:skyewooapp/controllers/products_controller.dart';
 import 'package:skyewooapp/handlers/handlers.dart';
-import 'package:skyewooapp/main.dart';
 import 'package:skyewooapp/models/category.dart';
 import 'package:skyewooapp/models/option.dart';
 import 'package:skyewooapp/models/product.dart';
 import 'package:skyewooapp/models/tag.dart';
-import 'package:skyewooapp/ui/filter_dialog.dart';
 import 'package:skyewooapp/screens/product/product_page.dart';
+import 'package:skyewooapp/ui/app_bar.dart';
+import 'package:skyewooapp/ui/filter_dialog.dart';
+import 'package:skyewooapp/ui/search/search_delegate.dart';
 
-class ShopBody extends StatefulWidget {
-  const ShopBody({Key? key})
-      : super(key: key); //removed const because of GetX controller
+class ArchivePage extends StatefulWidget {
+  const ArchivePage({
+    Key? key,
+    required this.title,
+    required this.slug,
+    this.subTitle = "",
+  }) : super(key: key);
+
+  final String title;
+  final String slug;
+  final String subTitle;
 
   @override
-  State<ShopBody> createState() => _ShopBodyState();
+  State<ArchivePage> createState() => _ArchivePageState();
 }
 
-class _ShopBodyState extends State<ShopBody> {
-  final ProductsController productsController = Get.put(ProductsController());
+class _ArchivePageState extends State<ArchivePage> {
+  AppAppBarController appBarController = AppAppBarController();
+
+  ProductsController productsController = Get.put(ProductsController());
 
   ScrollController _scrollController =
       ScrollController(initialScrollOffset: 5.0);
@@ -42,20 +49,10 @@ class _ShopBodyState extends State<ShopBody> {
   int? selectedTagIndex;
   int? selectedColorIndex;
 
-  // Initial Selected Value
-  int sortIndex = 0;
-
-  // List of items in our dropdown menu
-  List<ProductSort> sortItems = [
-    ProductSort(name: "title menu_order", title: 'Default sorting'),
-    ProductSort(name: "popularity", title: 'Sort by popularity'),
-    ProductSort(name: "rating", title: 'Sort by average rating'),
-    ProductSort(name: "date", title: 'Sort by latest'),
-    ProductSort(name: "price", title: 'Sort by price: low to high'),
-    ProductSort(name: "price-desc", title: 'Sort by price: high to low'),
-  ];
-
   init() async {
+    Get.reset();
+    productsController = Get.put(ProductsController());
+    productsController.selected_category = widget.slug;
     _scrollController = ScrollController(initialScrollOffset: 5.0)
       ..addListener(_scrollListener);
   }
@@ -72,130 +69,144 @@ class _ShopBodyState extends State<ShopBody> {
     final double itemHeight = (size.height - kToolbarHeight - 180) / 2;
     final double itemWidth = size.width / 2;
 
-    return Container(
-      color: Colors.white,
-      child: Column(
-        children: [
-          Material(
-            //HEADER FILTER
-            elevation: 1,
-            child: Container(
-              padding: const EdgeInsets.all(0),
-              width: double.infinity,
-              height: 50,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                border: Border(top: BorderSide(color: AppColors.f1)),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Expanded(
-                    child: ButtonTheme(
-                      alignedDropdown: true,
-                      child: DropdownButton<ProductSort>(
-                        isExpanded: true,
-                        value: sortItems[sortIndex],
-                        icon: const Icon(Icons.arrow_drop_down),
-                        items: sortItems.map((ProductSort item) {
-                          return DropdownMenuItem(
-                            value: item,
-                            child: Text(
-                              item.title,
+    return Scaffold(
+      appBar: AppAppBar(
+        controller: appBarController,
+        appBarType: "",
+        titleType: "logo",
+        title: widget.title,
+        hasSearch: false,
+      ),
+      body: Container(
+        color: Colors.white,
+        child: Column(
+          children: [
+            Material(
+              //HEADER FILTER
+              elevation: 1,
+              child: Container(
+                padding: const EdgeInsets.all(0),
+                width: double.infinity,
+                height: 50,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  border: Border(top: BorderSide(color: AppColors.f1)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    //CATEGORY TITLE
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              widget.title,
                               style: const TextStyle(
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            sortIndex = sortItems.indexOf(value!);
-                            productsController.order_by = value.getName;
-                            productsController.fetchProducts(append: false);
-                          });
-                        },
-                        underline: const SizedBox(),
+                            (() {
+                              if (widget.subTitle.isNotEmpty) {
+                                return Text(
+                                  widget.subTitle,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                  ),
+                                );
+                              } else {
+                                return const SizedBox();
+                              }
+                            }()),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  // SEARCH ICON BUTTON
-                  SizedBox(
-                    width: 50,
-                    child: Material(
-                      color: Colors.white,
-                      child: IconButton(
-                        icon: const Icon(Icons.search),
-                        onPressed: () {
-                          MyHomePage.showSearchBar(context);
-                        },
-                      ),
-                    ),
-                  ),
-                  // FILTER ICON BUTTON
-                  SizedBox(
-                    width: 50,
-                    child: Material(
-                      color: Colors.white,
-                      child: IconButton(
-                          onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return FilterDialog(
-                                    categories: categories,
-                                    tags: tags,
-                                    colors: colors,
-                                    priceRange: priceRange,
-                                    selectedCatIndex: selectedCatIndex,
-                                    selectedColorIndex: selectedColorIndex,
-                                    selectedTagIndex: selectedTagIndex,
-                                    selected_category:
-                                        productsController.selected_category,
-                                    selected_color:
-                                        productsController.selected_color,
-                                    selected_tag:
-                                        productsController.selected_tag,
-                                  );
-                                }).then(filterResult);
-                          },
-                          icon: const Icon(
-                            Icons.tune,
-                          )),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics(),
-              ),
-              scrollDirection: Axis.vertical,
-              controller: _scrollController,
-              child: Obx(() {
-                //message report
-                for (var message in productsController.messages) {
-                  Toaster.show(message: message);
-                }
-                //end message report
 
-                if (productsController.isLoading.value &&
-                    productsController.products.isEmpty) {
-                  return ShopShimmer(
-                    itemWidth: itemWidth,
-                    itemHeight: itemHeight,
-                  );
-                } else {
-                  return productsLayout(itemWidth, itemHeight);
-                }
-              }),
+                    // SEARCH ICON BUTTON
+                    SizedBox(
+                      width: 50,
+                      child: Material(
+                        color: Colors.white,
+                        child: IconButton(
+                          icon: const Icon(Icons.search),
+                          onPressed: () {
+                            showSearch(
+                                context: context,
+                                delegate: AppBarSearchDelegate());
+                          },
+                        ),
+                      ),
+                    ),
+                    // FILTER ICON BUTTON
+                    SizedBox(
+                      width: 50,
+                      child: Material(
+                        color: Colors.white,
+                        child: IconButton(
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return FilterDialog(
+                                      categories: categories,
+                                      tags: tags,
+                                      colors: colors,
+                                      priceRange: priceRange,
+                                      selectedCatIndex: selectedCatIndex,
+                                      selectedColorIndex: selectedColorIndex,
+                                      selectedTagIndex: selectedTagIndex,
+                                      selected_category:
+                                          productsController.selected_category,
+                                      selected_color:
+                                          productsController.selected_color,
+                                      selected_tag:
+                                          productsController.selected_tag,
+                                    );
+                                  }).then(filterResult);
+                            },
+                            icon: const Icon(
+                              Icons.tune,
+                            )),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ],
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics(),
+                ),
+                scrollDirection: Axis.vertical,
+                controller: _scrollController,
+                child: Obx(() {
+                  //message report
+                  for (var message in productsController.messages) {
+                    Toaster.show(message: message);
+                  }
+                  //end message report
+
+                  if (productsController.isLoading.value &&
+                      productsController.products.isEmpty) {
+                    return ShopShimmer(
+                      itemWidth: itemWidth,
+                      itemHeight: itemHeight,
+                    );
+                  } else {
+                    return productsLayout(itemWidth, itemHeight);
+                  }
+                }),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -251,11 +262,15 @@ class _ShopBodyState extends State<ShopBody> {
                     ),
                   ).then((dynamic result) {
                     //refresh necessary UIs
-                    MyHomePage.resetAppBar(context);
+                    if (appBarController.refreshAll != null) {
+                      appBarController.refreshAll!();
+                    }
                   });
                 },
                 onWishlistUpdated: () {
-                  MyHomePage.resetAppBar(context);
+                  if (appBarController.refreshAll != null) {
+                    appBarController.refreshAll!();
+                  }
                 },
               );
             }),
@@ -324,19 +339,4 @@ class _ShopBodyState extends State<ShopBody> {
       }
     }
   }
-}
-
-class ProductSort {
-  String name;
-  String title;
-
-  ProductSort({required this.name, required this.title});
-
-  String get getName => name;
-
-  set setName(String name) => this.name = name;
-
-  String get getTitle => title;
-
-  set setTitle(title) => this.title = title;
 }

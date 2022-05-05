@@ -29,7 +29,8 @@ import 'package:skyewooapp/models/comment.dart';
 import 'package:skyewooapp/models/option.dart';
 import 'package:skyewooapp/models/product.dart';
 import 'package:skyewooapp/site.dart';
-import 'package:skyewooapp/ui/product/reviews.dart';
+import 'package:skyewooapp/screens/archive/archive.dart';
+import 'package:skyewooapp/screens/product/reviews.dart';
 
 class ProductPage extends StatefulWidget {
   const ProductPage({
@@ -217,7 +218,9 @@ class _ProductPageState extends State<ProductPage> {
             ),
             actions: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, "cart");
+                },
                 icon: Badge(
                   position: BadgePosition.topEnd(top: -8, end: -4),
                   showBadge: showCartCount,
@@ -258,7 +261,18 @@ class _ProductPageState extends State<ProductPage> {
                         ),
                         const SizedBox(height: 10),
                         InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            //push
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ArchivePage(
+                                  title: categoryName,
+                                  slug: categorySlug,
+                                ),
+                              ),
+                            );
+                          },
                           child: Container(
                             color: AppColors.primary,
                             padding: const EdgeInsets.only(
@@ -278,21 +292,7 @@ class _ProductPageState extends State<ProductPage> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  //SEGMENT
-                  // Container(
-                  //   padding: const EdgeInsets.only(left: 10, right: 10),
-                  //   width: double.infinity,
-                  //   child: CupertinoSegmentedControl(
-                  //     padding: const EdgeInsets.all(0),
-                  //     children: segments,
-                  //     groupValue: selectedSegment,
-                  //     onValueChanged: (String value) {
-                  //       setState(() {
-                  //         selectedSegment = value;
-                  //       });
-                  //     },
-                  //   ),
-                  // ),
+
                   Container(
                     padding: const EdgeInsets.only(left: 10, right: 10),
                     width: double.infinity,
@@ -823,6 +823,7 @@ class _ProductPageState extends State<ProductPage> {
       if (result["status"] == "success") {
         setState(() {
           cartCount = result["contents_count"].toString();
+          showCartCount = int.parse(cartCount) > 0;
         });
         Toaster.showIcon(
           message: "Product added to cart",

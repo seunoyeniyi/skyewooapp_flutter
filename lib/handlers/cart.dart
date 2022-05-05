@@ -23,11 +23,11 @@ class Cart {
         if (body is Map) {
           Map<String, dynamic> json = jsonDecode(response.body);
 
-          userSession.update_last_cart_count(json["contents_count"].toString());
           itemsCount = json["contents_count"].toString();
         }
       }
     }
+    await userSession.update_last_cart_count(itemsCount);
     return itemsCount;
   }
 

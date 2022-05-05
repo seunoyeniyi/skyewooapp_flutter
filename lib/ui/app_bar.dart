@@ -11,9 +11,21 @@ class AppAppBar extends StatefulWidget implements PreferredSizeWidget {
     Key? key,
     this.preferredSize = const Size.fromHeight(56.0),
     required this.controller,
+    this.appBarType = "main",
+    this.title = "",
+    this.titleType = "logo",
+    this.hasCart = true,
+    this.hasSearch = true,
+    this.hasWishlist = true,
   }) : super(key: key);
 
   final AppAppBarController controller;
+  final String appBarType;
+  final String title;
+  final String titleType;
+  final bool hasWishlist;
+  final bool hasCart;
+  final bool hasSearch;
 
   @override
   final Size preferredSize;
@@ -59,76 +71,114 @@ class _AppAppBarState extends State<AppAppBar> {
   Widget build(BuildContext context) {
     return AppBar(
       elevation: 0,
-      title: Image.asset(
-        'assets/images/logo-wow.png',
-        fit: BoxFit.contain,
-        height: 40,
-      ),
+      title: (() {
+        if (widget.titleType == "logo") {
+          return Image.asset(
+            'assets/images/logo-wow.png',
+            fit: BoxFit.contain,
+            height: 40,
+          );
+        } else {
+          return Text(widget.title);
+        }
+      }()),
       leading: Builder(
         builder: (context) {
           return IconButton(
             onPressed: () {
-              Scaffold.of(context).openDrawer();
+              if (widget.appBarType == "main") {
+                if (Scaffold.of(context).hasDrawer) {
+                  Scaffold.of(context).openDrawer();
+                }
+              } else {
+                Navigator.pop(context);
+              }
             },
-            icon: SvgPicture.asset(
-              "assets/icons/icons8_align_left.svg",
-              height: 30,
-              width: 30,
-            ),
+            icon: (() {
+              if (widget.appBarType == "main") {
+                return SvgPicture.asset(
+                  "assets/icons/icons8_align_left.svg",
+                  height: 30,
+                  width: 30,
+                );
+              } else {
+                return const Icon(Icons.arrow_back);
+              }
+            }()),
           );
         },
       ),
       actions: <Widget>[
-        IconButton(
-          onPressed: () {},
-          icon: Badge(
-            position: BadgePosition.topEnd(top: -8, end: -4),
-            showBadge: showWishlistBadge,
-            padding: const EdgeInsets.all(7),
-            badgeContent: const Text(
-              "",
-              style: TextStyle(color: Colors.white, fontSize: 12),
-            ),
-            badgeColor: Colors.red,
-            child: SvgPicture.asset(
-              (showWishlistBadge)
-                  ? "assets/icons/icons8_heart.svg"
-                  : "assets/icons/icons8_heart_outline.svg",
-              height: 25,
-            ),
-          ),
-        ),
-        IconButton(
-          onPressed: () {},
-          icon: Badge(
-            position: BadgePosition.topEnd(top: -8, end: -4),
-            showBadge: showCartCount,
-            padding: const EdgeInsets.all(5),
-            badgeContent: Text(
-              cartCount,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
-            ),
-            badgeColor: AppColors.primary,
-            child: SvgPicture.asset(
-              "assets/icons/icons8_shopping_bag.svg",
-              height: 25,
-            ),
-          ),
-        ),
-        Padding(
-            padding: const EdgeInsets.only(right: 5.0),
-            child: GestureDetector(
-              onTap: () {},
-              child: IconButton(
-                  onPressed: () {
-                    showSearch(
-                        context: context, delegate: AppBarSearchDelegate());
-                  },
-                  icon: SvgPicture.asset(
-                    "assets/icons/icons8_search.svg",
-                    height: 25,
-                  )),
-            )),
+        //heart wishlist
+        (() {
+          if (widget.hasWishlist) {
+            return IconButton(
+              onPressed: () {
+                Navigator.pushNamed(context, "wishlist");
+              },
+              icon: Badge(
+                position: BadgePosition.topEnd(top: -8, end: -4),
+                showBadge: showWishlistBadge,
+                padding: const EdgeInsets.all(7),
+                badgeContent: const Text(
+                  "",
+                  style: TextStyle(color: Colors.white, fontSize: 12),
+                ),
+                badgeColor: Colors.red,
+                child: SvgPicture.asset(
+                  (showWishlistBadge)
+                      ? "assets/icons/icons8_heart.svg"
+                      : "assets/icons/icons8_heart_outline.svg",
+                  height: 25,
+                ),
+              ),
+            );
+          } else {
+            return const SizedBox();
+          }
+        }()),
+        //bag shopping cart
+        (() {
+          if (widget.hasCart) {
+            return IconButton(
+              onPressed: () {
+                Navigator.pushNamed(context, "cart");
+              },
+              icon: Badge(
+                position: BadgePosition.topEnd(top: -8, end: -4),
+                showBadge: showCartCount,
+                padding: const EdgeInsets.all(5),
+                badgeContent: Text(
+                  cartCount,
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                ),
+                badgeColor: AppColors.primary,
+                child: SvgPicture.asset(
+                  "assets/icons/icons8_shopping_bag.svg",
+                  height: 25,
+                ),
+              ),
+            );
+          } else {
+            return const SizedBox();
+          }
+        }()),
+        //search
+        (() {
+          if (widget.hasSearch) {
+            return IconButton(
+              onPressed: () {
+                showSearch(context: context, delegate: AppBarSearchDelegate());
+              },
+              icon: SvgPicture.asset(
+                "assets/icons/icons8_search.svg",
+                height: 25,
+              ),
+            );
+          } else {
+            return const SizedBox();
+          }
+        }()),
       ],
     );
   }
@@ -146,7 +196,9 @@ class _AppAppBarState extends State<AppAppBar> {
     } else {
       showCartCount = false;
     }
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void updateCartCount(String count) {
@@ -157,9 +209,11 @@ class _AppAppBarState extends State<AppAppBar> {
   }
 
   void updateWishlistBadge(String count) {
-    setState(() {
-      showWishlistBadge = (int.parse(count) > 0);
-    });
+    if (mounted) {
+      setState(() {
+        showWishlistBadge = (int.parse(count) > 0);
+      });
+    }
   }
 }
 

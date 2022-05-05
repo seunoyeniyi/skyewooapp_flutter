@@ -16,7 +16,7 @@ import 'package:skyewooapp/handlers/handlers.dart';
 import 'package:skyewooapp/handlers/user_session.dart';
 import 'package:skyewooapp/models/comment.dart';
 import 'package:skyewooapp/site.dart';
-import 'package:skyewooapp/ui/product/single_review.dart';
+import 'package:skyewooapp/screens/product/single_review.dart';
 
 class Reviews extends StatefulWidget {
   const Reviews({

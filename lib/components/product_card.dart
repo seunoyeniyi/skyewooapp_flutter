@@ -10,7 +10,6 @@ import 'package:skyewooapp/handlers/formatter.dart';
 import 'package:skyewooapp/handlers/handlers.dart';
 import 'package:skyewooapp/handlers/user_session.dart';
 import 'package:skyewooapp/handlers/wishlist.dart';
-import 'package:skyewooapp/main.dart';
 import 'package:skyewooapp/site.dart';
 import 'package:html_character_entities/html_character_entities.dart';
 
@@ -27,6 +26,7 @@ class ProductCard extends StatefulWidget {
     required this.inWishlist,
     required this.discountValue,
     required this.onPressed,
+    required this.onWishlistUpdated,
   }) : super(key: key);
 
   final UserSession userSession;
@@ -39,6 +39,7 @@ class ProductCard extends StatefulWidget {
   final bool inWishlist;
   final String discountValue;
   final Function({bool inWishlist}) onPressed;
+  final Function() onWishlistUpdated;
 
   @override
   State<ProductCard> createState() => _ProductCardState();
@@ -271,8 +272,7 @@ class _ProductCardState extends State<ProductCard> {
     }
 
     await userSession.reload();
-    MyHomePage.upateAppBarWishlistBadge(
-        context, userSession.last_wishlist_count);
+    widget.onWishlistUpdated();
 
     setState(() {});
   }
