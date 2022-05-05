@@ -20,10 +20,10 @@ class SingleReview extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
-      margin: const EdgeInsets.only(bottom: 15),
+      margin: const EdgeInsets.only(bottom: 10, top: 10),
       child: Row(
         children: [
-          //avater
+          //avatar
           SizedBox(
             height: 40,
             width: 40,
@@ -72,13 +72,13 @@ class SingleReview extends StatelessWidget {
                 RatingBar.builder(
                   ignoreGestures: true,
                   initialRating: double.parse(
-                      comment.getRating.isNotEmpty ? comment.getRating : "0"),
+                      comment.getRating.isNotEmpty ? comment.getRating : "5"),
                   minRating: 1,
                   direction: Axis.horizontal,
                   allowHalfRating: true,
                   itemCount: 5,
                   itemSize: 15,
-                  itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  itemPadding: const EdgeInsets.symmetric(horizontal: 1.0),
                   itemBuilder: (context, _) => const Icon(
                     Icons.star,
                     color: Colors.amber,

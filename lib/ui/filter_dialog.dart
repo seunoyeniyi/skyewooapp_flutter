@@ -130,6 +130,7 @@ class _FilterDialogState extends State<FilterDialog> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        elevation: 0,
         title: Row(
           children: const [
             Icon(

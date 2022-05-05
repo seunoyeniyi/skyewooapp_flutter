@@ -1,13 +1,21 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:skyewooapp/app_colors.dart';
+import 'package:skyewooapp/components/loading_box.dart';
 import 'package:skyewooapp/handlers/app_styles.dart';
+import 'package:skyewooapp/handlers/handlers.dart';
+import 'package:skyewooapp/handlers/user_session.dart';
 import 'package:skyewooapp/models/comment.dart';
+import 'package:skyewooapp/site.dart';
 import 'package:skyewooapp/ui/product/single_review.dart';
 
 class Reviews extends StatefulWidget {
@@ -17,18 +25,28 @@ class Reviews extends StatefulWidget {
     required this.averageRating,
     required this.reviewsCount,
     required this.comments,
+    required this.productID,
+    required this.userSession,
+    required this.onReviewUpdated,
   }) : super(key: key);
 
+  final String productID;
+  final UserSession userSession;
   final bool haveReviews;
   final double averageRating;
   final int reviewsCount;
   final List<Comment> comments;
+  final Function(int newReviewCount, bool didHaveReviews,
+      List<Comment> newComments, double userRating) onReviewUpdated;
 
   @override
   State<Reviews> createState() => _ReviewsState();
 }
 
 class _ReviewsState extends State<Reviews> {
+  double newReviewRating = 0;
+  final commentTextController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -119,7 +137,7 @@ class _ReviewsState extends State<Reviews> {
               color: Colors.amber,
             ),
             onRatingUpdate: (rating) {
-              log(rating.toString());
+              newReviewRating = rating;
             },
           ),
         ),
@@ -143,12 +161,13 @@ class _ReviewsState extends State<Reviews> {
             ),
             borderRadius: BorderRadius.circular(5),
           ),
-          child: const TextField(
+          child: TextField(
+            controller: commentTextController,
             keyboardType: TextInputType.multiline,
             textInputAction: TextInputAction.newline,
             minLines: 5,
             maxLines: 5,
-            decoration: InputDecoration.collapsed(
+            decoration: const InputDecoration.collapsed(
               hintText: 'Comment',
             ),
           ),
@@ -156,7 +175,7 @@ class _ReviewsState extends State<Reviews> {
         const SizedBox(height: 10),
         TextButton(
           style: AppStyles.flatButtonStyle(),
-          onPressed: () {},
+          onPressed: addReview,
           child: const Text(
             "Submit Review",
             style: TextStyle(fontSize: 16),
@@ -164,5 +183,69 @@ class _ReviewsState extends State<Reviews> {
         ),
       ],
     );
+  }
+
+  addReview() async {
+    if (!widget.userSession.logged()) {
+      ToastBar.show(context, "Please login to add review.");
+      return;
+    }
+    if (newReviewRating < 1) {
+      ToastBar.show(
+          context, "Please tap the rating start, to rate this product.");
+      return;
+    }
+    if (commentTextController.text.isEmpty) {
+      ToastBar.show(context, "Please write a comment.");
+      return;
+    }
+    try {
+      //show progress dialog
+      SmartDialog.show(widget: const LoadingBox(text: "Adding review..."));
+      //fetch
+      String url =
+          Site.ADD_REVIEW + widget.productID + "/" + widget.userSession.ID;
+      dynamic data = {
+        "rating": newReviewRating.toString(),
+        "comment": commentTextController.text,
+        "token_key": Site.TOKEN_KEY,
+      };
+
+      Response response = await post(url, body: data);
+
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
+        Map<String, dynamic> json = jsonDecode(response.body);
+        if (json["status"] == "success") {
+          widget.comments.add(Comment(
+            username: widget.userSession.username,
+            comment: commentTextController.text,
+            rating: newReviewRating.toString(),
+            userImage: widget.userSession.profile_image,
+          ));
+          widget.onReviewUpdated(
+            widget.comments.length,
+            true,
+            widget.comments,
+            newReviewRating,
+          );
+          Toaster.showIcon(
+            message: "Review submitted",
+            icon: Icons.check,
+            context: context,
+            gravity: ToastGravity.TOP,
+          );
+        } else {
+          ToastBar.show(context, "Unable to add review... Please try again!");
+        }
+      } else {
+        ToastBar.show(context, "Unable to add review... Please try again!");
+      }
+    } finally {
+      if (mounted) {
+        commentTextController.text = "";
+        SmartDialog.dismiss();
+        setState(() {});
+      }
+    }
   }
 }

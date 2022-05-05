@@ -11,6 +11,7 @@ class UserSession {
   String last_wishlist_count = "0";
   int date = DateTime.now().millisecondsSinceEpoch;
   bool _logged = false;
+  String profile_image = "";
 
   UserSession() {
     init();
@@ -26,6 +27,7 @@ class UserSession {
     last_orders_count = pref.getString("last_orders_count") ?? "0";
     last_cart_count = pref.getString("last_cart_count") ?? "0";
     last_wishlist_count = pref.getString("last_wishlist_count") ?? "0";
+    profile_image = pref.getString("profile_image") ?? "";
   }
 
   Future<void> reload() async {
@@ -61,9 +63,16 @@ class UserSession {
       "logged": logged,
       "last_orders_count": last_orders_count,
       "last_cart_count": last_cart_count,
-      "last_wishlist_count": last_wishlist_count
+      "last_wishlist_count": last_wishlist_count,
+      "profile_image": profile_image
     };
     return data;
+  }
+
+  Future<void> update_profile_image(String image) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("profile_image", image);
+    profile_image = image;
   }
 
   Future<void> update_last_orders_count(String count) async {

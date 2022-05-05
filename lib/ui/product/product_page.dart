@@ -18,6 +18,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:skyewooapp/app_colors.dart';
 import 'package:skyewooapp/components/attributes/attributes_selector.dart';
 import 'package:skyewooapp/components/loading_box.dart';
+import 'package:skyewooapp/components/segment_selector.dart';
 import 'package:skyewooapp/handlers/cart.dart';
 import 'package:skyewooapp/handlers/formatter.dart';
 import 'package:skyewooapp/handlers/handlers.dart';
@@ -54,10 +55,10 @@ class _ProductPageState extends State<ProductPage> {
 
   int _quantity = 1;
 
-  Map<String, Widget> segments = {
-    "product": const Text("PRODUCT"),
-    "reviews": const Text("REVIEWS"),
-  };
+  List<Segment> segments = [
+    Segment(key: "product", value: const Text("PRODUCT")),
+    Segment(key: "reviews", value: const Text("REVIEWS")),
+  ];
   String selectedSegment = "product";
 
   bool isLoading = true;
@@ -77,6 +78,7 @@ class _ProductPageState extends State<ProductPage> {
   double averageRating = 0;
   int reviewsCount = 0;
   List<Comment> comments = [];
+  Map<String, String> sizeChartImage = {"type": "none", "path": ""};
   //END PRODUCT DETAILS
 
   init() async {
@@ -239,6 +241,7 @@ class _ProductPageState extends State<ProductPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  //title, and category label
                   Container(
                     padding: const EdgeInsets.all(10),
                     width: double.infinity,
@@ -247,7 +250,7 @@ class _ProductPageState extends State<ProductPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          product.getName,
+                          product.getName + " " + product.getID,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -275,16 +278,29 @@ class _ProductPageState extends State<ProductPage> {
                     ),
                   ),
                   const SizedBox(height: 10),
+                  //SEGMENT
+                  // Container(
+                  //   padding: const EdgeInsets.only(left: 10, right: 10),
+                  //   width: double.infinity,
+                  //   child: CupertinoSegmentedControl(
+                  //     padding: const EdgeInsets.all(0),
+                  //     children: segments,
+                  //     groupValue: selectedSegment,
+                  //     onValueChanged: (String value) {
+                  //       setState(() {
+                  //         selectedSegment = value;
+                  //       });
+                  //     },
+                  //   ),
+                  // ),
                   Container(
                     padding: const EdgeInsets.only(left: 10, right: 10),
                     width: double.infinity,
-                    child: CupertinoSegmentedControl(
-                      padding: const EdgeInsets.all(0),
-                      children: segments,
-                      groupValue: selectedSegment,
-                      onValueChanged: (String value) {
+                    child: SegmentSelector(
+                      segments: segments,
+                      onSelected: (segment) {
                         setState(() {
-                          selectedSegment = value;
+                          selectedSegment = segment.getKey;
                         });
                       },
                     ),
@@ -377,7 +393,6 @@ class _ProductPageState extends State<ProductPage> {
                             ),
                           ),
                           //DESCRIPTON CONTAINER
-
                           Visibility(
                             visible: !isLoading &&
                                 description.isNotEmpty &&
@@ -392,6 +407,10 @@ class _ProductPageState extends State<ProductPage> {
                                       data: description,
                                       defaultTextStyle: const TextStyle(
                                         fontSize: 11,
+                                      ),
+                                      linkStyle: const TextStyle(
+                                        color: Colors.black,
+                                        decoration: TextDecoration.none,
                                       ),
                                     )),
                               ],
@@ -433,10 +452,25 @@ class _ProductPageState extends State<ProductPage> {
                           Visibility(
                             visible: !isLoading,
                             child: Reviews(
+                              userSession: userSession,
+                              productID: product.getID,
                               haveReviews: haveReviews,
                               averageRating: averageRating,
                               reviewsCount: reviewsCount,
                               comments: comments,
+                              onReviewUpdated: (int newReviewCount,
+                                  bool didHaveReviews,
+                                  List<Comment> newComments,
+                                  double userRating) {
+                                setState(() {
+                                  segments[1].setValue = Text("REVIEWS(" +
+                                      newReviewCount.toString() +
+                                      ")");
+                                  haveReviews = didHaveReviews;
+                                  reviewsCount = newReviewCount;
+                                  averageRating = userRating;
+                                });
+                              },
                             ),
                           ),
                           //refresh
@@ -479,6 +513,44 @@ class _ProductPageState extends State<ProductPage> {
                                   ),
                                 ),
                               ),
+                            ),
+                          ),
+                          //size chart image
+                          Visibility(
+                            visible: !isLoading,
+                            child: Container(
+                              child: (() {
+                                if (sizeChartImage["type"] == "asset") {
+                                  return Image.asset(sizeChartImage["path"]!);
+                                } else if (sizeChartImage["type"] == "url") {
+                                  return CachedNetworkImage(
+                                    imageUrl: sizeChartImage["path"]!,
+                                    placeholder: (context, url) =>
+                                        Shimmer.fromColors(
+                                      baseColor: AppColors.f1,
+                                      highlightColor: Colors.white,
+                                      period: const Duration(milliseconds: 500),
+                                      child: Container(
+                                        color: AppColors.hover,
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        Container(
+                                      color: AppColors.f1,
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(80.0),
+                                        child: Icon(Icons.error),
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  return const Padding(
+                                      padding: EdgeInsets.all(30),
+                                      child: Center(
+                                        child: Text("No Size Chart"),
+                                      ));
+                                }
+                              }()),
                             ),
                           ),
                           //refresh
@@ -624,6 +696,46 @@ class _ProductPageState extends State<ProductPage> {
           Map<String, dynamic> category = categories[0];
           categoryName = category["name"].toString();
           categorySlug = category["slug"].toString(); //for onclick of the label
+
+          // SIZE CHART #######################
+
+          if (json.containsKey("sk_size_chart_image")
+              ? json["sk_size_chart_image"].toString().isNotEmpty &&
+                  json["sk_size_chart_image"].toString().length > 15
+              : false) {
+            //from the web
+            segments.add(
+                Segment(key: "size_chart", value: const Text("SIZE CHART")));
+            sizeChartImage["type"] = "url";
+            sizeChartImage["path"] = json["sk_size_chart_image"].toString();
+          } else {
+            //from asset or none
+            if (category["slug"].toString() == "mens-boxers") {
+              segments.add(
+                  Segment(key: "size_chart", value: const Text("SIZE CHART")));
+              sizeChartImage["type"] = "asset";
+              sizeChartImage["path"] =
+                  "assets/images/sizingchart_mensboxers.jpg";
+            } else if (category["slug"].toString() == "womens-boxers") {
+              segments.add(
+                  Segment(key: "size_chart", value: const Text("SIZE CHART")));
+              sizeChartImage["type"] = "asset";
+              sizeChartImage["path"] =
+                  "assets/images/sizingchart_womensboxers.jpg";
+            } else if (category["slug"].toString() == "t-shirts") {
+              segments.add(
+                  Segment(key: "size_chart", value: const Text("SIZE CHART")));
+              sizeChartImage["type"] = "asset";
+              sizeChartImage["path"] =
+                  "assets/images/sizingchart_unisex_tshirt.jpg";
+            } else {
+              sizeChartImage["type"] = "none";
+              sizeChartImage["path"] = "";
+            }
+          }
+
+          // END SIZE CHART #######################
+
         }
         //############## END CATEGRY NAME #####################
 
@@ -662,6 +774,16 @@ class _ProductPageState extends State<ProductPage> {
           haveReviews = true;
           averageRating = double.parse(json["average_rating"].toString());
           reviewsCount = int.parse(json["review_count"].toString());
+          // segments["reviews"] = Text("REVIEWS(" + reviewsCount.toString() + ")");
+          segments[1].setValue =
+              Text("REVIEWS(" + reviewsCount.toString() + ")");
+        }
+
+        //issue not zero rating with only one user rating
+        if (jsonComments.isNotEmpty &&
+            json["average_rating"].toString() == "0" &&
+            json["review_count"].toString() == "1") {
+          averageRating = double.parse(jsonComments[0]["rating"].toString());
         }
 
         for (var comment in jsonComments) {
@@ -672,8 +794,8 @@ class _ProductPageState extends State<ProductPage> {
             userImage: comment["user_image"].toString(),
           ));
         }
-
         //################ END RATING AND REVIEWS #######################
+
       } else {
         Toaster.show(message: "Unable to get product.");
         tryAgain = true;
