@@ -3,6 +3,8 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:skyewooapp/app_colors.dart';
 import 'package:skyewooapp/models/product.dart';
 import 'package:skyewooapp/screens/cart/cart_page.dart';
+import 'package:skyewooapp/screens/categories/categories.dart';
+import 'package:skyewooapp/screens/orders/orders.dart';
 import 'package:skyewooapp/screens/wishlist/wishlist_page.dart';
 import 'package:skyewooapp/ui/home/home.dart';
 import 'package:skyewooapp/screens/login/login_screen.dart';
@@ -40,6 +42,8 @@ class MyApp extends StatelessWidget {
         "register": (BuildContext context) => const SignUpScreen(),
         "cart": (BuildContext context) => const CartPage(),
         "wishlist": (BuildContext context) => const WishlistPage(),
+        "categories": (BuildContext context) => const CategoriesPage(),
+        "orders": (BuildContext context) => const OrdersPage(),
       },
     );
   }
@@ -89,12 +93,13 @@ class _MyHomePageState extends State<MyHomePage> {
   Key? key = UniqueKey();
 
   final List<Widget> bodies = [
-    const ShopBody(key: PageStorageKey("ShopBody")),
     const HomeBody(key: PageStorageKey("HomeBody")),
+    const ShopBody(key: PageStorageKey("ShopBody")),
   ];
   int _bodyIndex = 0;
 
   void restartApp() {
+    resetAppBar();
     setState(() {
       key = UniqueKey();
     });

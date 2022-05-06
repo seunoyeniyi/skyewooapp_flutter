@@ -21,12 +21,24 @@ class ProductsController extends GetxController {
   String paged = "1";
   int currentPaged = 1;
   String numPerPage = "40";
+  bool forWishlist = false;
+  var search = "".obs;
+  bool initialize = true;
 
   //filter
   String selected_category = "";
   String selected_tag = "";
   String selected_color = "";
   RangeValues? priceRange;
+
+  ProductsController({
+    this.initialize = true,
+    bool isLoading = true,
+    this.forWishlist = false, //for wishlist page
+    this.selected_category = "", //for archive page
+  }) {
+    this.isLoading.value = isLoading;
+  }
 
   @override
   void onInit() {
@@ -36,7 +48,9 @@ class ProductsController extends GetxController {
 
   init() async {
     await userSession.value.init();
-    fetchProducts();
+    if (initialize) {
+      fetchProducts();
+    }
   }
 
   void fetchProducts({bool append = true}) async {
@@ -134,6 +148,18 @@ class ProductsController extends GetxController {
             Site.TOKEN_KEY;
       }
 
+      if (search.value.isNotEmpty) {
+        url = url + "&search=" + search.value;
+      }
+
+      if (forWishlist) {
+        url = Site.WISH_LIST +
+            userSession.value.ID +
+            "?hide_description=1" +
+            "&token_key=" +
+            Site.TOKEN_KEY;
+      }
+
       Response response = await get(url);
 
       if (response.statusCode == 200) {
@@ -166,6 +192,12 @@ class ProductsController extends GetxController {
                 item["highest_variation_price"].toString();
 
             products.add(product);
+          }
+
+          //update wishlist count if is forWishlist
+          if (forWishlist) {
+            await userSession.value
+                .update_last_wishlist_count(results.length.toString());
           }
 
           if (json.containsKey("pagination")) {

@@ -1,8 +1,10 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:skyewooapp/app_colors.dart';
 import 'package:skyewooapp/handlers/cart.dart';
+import 'package:skyewooapp/handlers/handlers.dart';
 import 'package:skyewooapp/handlers/user_session.dart';
 import 'package:skyewooapp/ui/search/search_delegate.dart';
 
@@ -17,6 +19,7 @@ class AppAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.hasCart = true,
     this.hasSearch = true,
     this.hasWishlist = true,
+    this.elevation = 0,
   }) : super(key: key);
 
   final AppAppBarController controller;
@@ -26,6 +29,7 @@ class AppAppBar extends StatefulWidget implements PreferredSizeWidget {
   final bool hasWishlist;
   final bool hasCart;
   final bool hasSearch;
+  final double elevation;
 
   @override
   final Size preferredSize;
@@ -70,7 +74,7 @@ class _AppAppBarState extends State<AppAppBar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      elevation: 0,
+      elevation: widget.elevation,
       title: (() {
         if (widget.titleType == "logo") {
           return Image.asset(
@@ -114,7 +118,15 @@ class _AppAppBarState extends State<AppAppBar> {
           if (widget.hasWishlist) {
             return IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, "wishlist");
+                if (userSession.logged()) {
+                  if (AppRoute.getName(context) != "wishlist") {
+                    Navigator.pushNamed(context, "wishlist").then((value) {
+                      refreshAll();
+                    });
+                  }
+                } else {
+                  Toaster.show(message: "Please login or register first");
+                }
               },
               icon: Badge(
                 position: BadgePosition.topEnd(top: -8, end: -4),
@@ -142,7 +154,11 @@ class _AppAppBarState extends State<AppAppBar> {
           if (widget.hasCart) {
             return IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, "cart");
+                if (AppRoute.getName(context) != "cart") {
+                  Navigator.pushNamed(context, "cart").then((value) {
+                    refreshAll();
+                  });
+                }
               },
               icon: Badge(
                 position: BadgePosition.topEnd(top: -8, end: -4),
@@ -184,7 +200,10 @@ class _AppAppBarState extends State<AppAppBar> {
   }
 
   void displaySearch() {
-    showSearch(context: context, delegate: AppBarSearchDelegate());
+    showSearch(context: context, delegate: AppBarSearchDelegate())
+        .then((value) {
+      refreshAll();
+    });
   }
 
   fetchCart() async {

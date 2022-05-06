@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:skyewooapp/handlers/user_session.dart';
 import 'package:skyewooapp/main.dart';
+import 'package:skyewooapp/screens/archive/archive.dart';
+import 'package:skyewooapp/screens/orders/orders.dart';
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({Key? key}) : super(key: key);
@@ -148,7 +150,10 @@ class _AppDrawerState extends State<AppDrawer> {
                   'Categories',
                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, "categories");
+                },
               ),
               ListTile(
                 leading: SvgPicture.asset(
@@ -160,7 +165,10 @@ class _AppDrawerState extends State<AppDrawer> {
                   'Wishlist',
                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, "wishlist");
+                },
               ),
               ListTile(
                 leading: SvgPicture.asset(
@@ -172,7 +180,10 @@ class _AppDrawerState extends State<AppDrawer> {
                   'Orders',
                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, "orders");
+                },
               ),
               ListTile(
                 leading: SvgPicture.asset(
@@ -196,7 +207,19 @@ class _AppDrawerState extends State<AppDrawer> {
                   'Sales',
                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ArchivePage(
+                        title: "Sales",
+                        slug: "sale",
+                        subTitle: "With Discount",
+                      ),
+                    ),
+                  );
+                },
               ),
               ListTile(
                 leading: SvgPicture.asset(

@@ -289,7 +289,8 @@ class _ShopBodyState extends State<ShopBody> {
             (_scrollController.position.maxScrollExtent - 500) &&
         !_scrollController.position.outOfRange &&
         !productsController.isLoading.value &&
-        !productsController.gotToEnd.value) {
+        !productsController.gotToEnd.value &&
+        productsController.products.length > 10) {
       if (!productsController.isLoading.value) {
         productsController.currentPaged = productsController.currentPaged + 1;
         productsController.paged = productsController.currentPaged.toString();

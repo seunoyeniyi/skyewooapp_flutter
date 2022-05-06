@@ -82,7 +82,11 @@ class Toaster {
 
 class AppRoute {
   static String getName(BuildContext context) {
-    return ModalRoute.of(context)!.settings.name ?? "";
+    if (ModalRoute.of(context) != null) {
+      return ModalRoute.of(context)!.settings.name ?? "";
+    } else {
+      return "";
+    }
   }
 }
 

@@ -51,8 +51,8 @@ class _ArchivePageState extends State<ArchivePage> {
 
   init() async {
     Get.reset();
-    productsController = Get.put(ProductsController());
-    productsController.selected_category = widget.slug;
+    productsController =
+        Get.put(ProductsController(selected_category: widget.slug));
     _scrollController = ScrollController(initialScrollOffset: 5.0)
       ..addListener(_scrollListener);
   }
@@ -137,8 +137,13 @@ class _ArchivePageState extends State<ArchivePage> {
                           icon: const Icon(Icons.search),
                           onPressed: () {
                             showSearch(
-                                context: context,
-                                delegate: AppBarSearchDelegate());
+                              context: context,
+                              delegate: AppBarSearchDelegate(),
+                            ).then((value) {
+                              if (appBarController.refreshAll != null) {
+                                appBarController.refreshAll!();
+                              }
+                            });
                           },
                         ),
                       ),
@@ -304,7 +309,8 @@ class _ArchivePageState extends State<ArchivePage> {
             (_scrollController.position.maxScrollExtent - 500) &&
         !_scrollController.position.outOfRange &&
         !productsController.isLoading.value &&
-        !productsController.gotToEnd.value) {
+        !productsController.gotToEnd.value &&
+        productsController.products.length > 10) {
       if (!productsController.isLoading.value) {
         productsController.currentPaged = productsController.currentPaged + 1;
         productsController.paged = productsController.currentPaged.toString();

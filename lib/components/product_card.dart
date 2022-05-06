@@ -264,8 +264,11 @@ class _ProductCardState extends State<ProductCard> {
             gravity: ToastGravity.TOP);
       } else {
         inWishlist = true;
-        Toaster.show(
-            message: "Product added to wishlist!", gravity: ToastGravity.TOP);
+        Toaster.showIcon(
+            context: context,
+            icon: Icons.check,
+            message: "Product added to wishlist!",
+            gravity: ToastGravity.TOP);
       }
     } else {
       Toaster.show(message: "Coudn't update wishlist.");
