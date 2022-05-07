@@ -6,6 +6,8 @@ import 'package:skyewooapp/app_colors.dart';
 import 'package:skyewooapp/handlers/handlers.dart';
 import 'package:skyewooapp/handlers/user_session.dart';
 import 'package:skyewooapp/models/order.dart';
+import 'package:skyewooapp/screens/order/order.dart';
+import 'package:skyewooapp/screens/orders/order_card.dart';
 import 'package:skyewooapp/screens/orders/shimmer.dart';
 import 'package:skyewooapp/site.dart';
 import 'package:skyewooapp/ui/app_bar.dart';
@@ -142,7 +144,32 @@ class _OrdersPageState extends State<OrdersPage> {
                         ),
                       );
                     } else {
-                      return const Text("Show orders");
+                      return Container(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: List.generate(orders.length, (index) {
+                            return OrderCard(
+                              orderID: orders[index].getId,
+                              date: orders[index].getDate,
+                              status: orders[index].getStatus,
+                              paymentMethod: orders[index].getPaymentMethod,
+                              amount: orders[index].getAmount,
+                              onTapped: () {
+                                //push
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => OrderPage(
+                                      orderID: orders[index].getId,
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          }),
+                        ),
+                      );
                     }
                   }()),
                 ),

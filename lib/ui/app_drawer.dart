@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:skyewooapp/handlers/handlers.dart';
 import 'package:skyewooapp/handlers/user_session.dart';
 import 'package:skyewooapp/main.dart';
 import 'package:skyewooapp/screens/archive/archive.dart';
@@ -166,8 +168,14 @@ class _AppDrawerState extends State<AppDrawer> {
                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                 ),
                 onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, "wishlist");
+                  if (userSession.logged()) {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, "wishlist");
+                  } else {
+                    Toaster.show(
+                        message: "Please Login or Register first.",
+                        gravity: ToastGravity.TOP);
+                  }
                 },
               ),
               ListTile(
@@ -181,8 +189,15 @@ class _AppDrawerState extends State<AppDrawer> {
                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                 ),
                 onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, "orders");
+                  if (userSession.logged()) {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, "orders");
+                  } else {
+                    Toaster.show(
+                      message: "Please Login or Register first.",
+                      gravity: ToastGravity.TOP,
+                    );
+                  }
                 },
               ),
               ListTile(

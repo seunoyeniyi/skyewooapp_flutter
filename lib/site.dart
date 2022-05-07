@@ -1,10 +1,10 @@
 // ignore_for_file: non_constant_identifier_names
 
 class Site {
-  static String NAME = "AstroQ8";
+  static String NAME = "WhatsDown";
   static String PROTOCOL = "https";
   static String DOMAIN =
-      "astroq8.com"; //"192.168.43.11"; // "192.168.43.223"; //"10.0.2.2"; //
+      "whatsdown.in"; //"192.168.43.11"; // "192.168.43.223"; //"10.0.2.2"; //
   static String ADDRESS = PROTOCOL + "://" + DOMAIN + "/";
   static String TOKEN_KEY =
       "OyO3muQ98b1uEHzQVg4X4trpFcrx3SxFFZIWXHAOz6HWZBUoLe";
