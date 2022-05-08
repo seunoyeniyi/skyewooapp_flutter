@@ -1,7 +1,6 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:skyewooapp/app_colors.dart';
 import 'package:skyewooapp/handlers/cart.dart';
 import 'package:skyewooapp/handlers/handlers.dart';

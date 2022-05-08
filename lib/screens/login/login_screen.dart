@@ -117,7 +117,8 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    SmartDialog.showLoading(widget: const LoadingBox());
+    SmartDialog.showLoading(
+        clickBgDismissTemp: false, widget: const LoadingBox());
 
     String url = Site.LOGIN + "?token_key=" + Site.TOKEN_KEY;
 

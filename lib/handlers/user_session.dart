@@ -95,7 +95,7 @@ class UserSession {
 
   bool logged() {
     init();
-    return _logged;
+    return (_logged && ID != "0");
   }
 
   Future<void> logout() async {

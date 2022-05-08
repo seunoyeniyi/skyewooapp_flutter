@@ -1,8 +1,4 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:html_character_entities/html_character_entities.dart';
-import 'package:skyewooapp/app_colors.dart';
 import 'package:skyewooapp/components/size_swatch_card.dart';
 import 'package:skyewooapp/models/option.dart';
 

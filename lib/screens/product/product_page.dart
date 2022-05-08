@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:badges/badges.dart';
 // ignore: import_of_legacy_library_into_null_safe
@@ -7,12 +6,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cart_stepper/cart_stepper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:html_character_entities/html_character_entities.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:http/http.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:skyewooapp/app_colors.dart';
@@ -813,9 +814,10 @@ class _ProductPageState extends State<ProductPage> {
     Cart cart = Cart(userSession: userSession);
     if (priceAvailable && cartProductID != "0") {
       SmartDialog.showLoading(
+          clickBgDismissTemp: false,
           widget: const LoadingBox(
-        text: "Adding to cart...",
-      ));
+            text: "Adding to cart...",
+          ));
 
       Map<String, dynamic> result =
           await cart.addToCart(productID: cartProductID, quantity: _quantity);

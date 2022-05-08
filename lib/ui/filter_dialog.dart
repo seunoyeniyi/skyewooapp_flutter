@@ -1,10 +1,10 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:html_character_entities/html_character_entities.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:http/http.dart';
 import 'package:skyewooapp/app_colors.dart';
 import 'package:skyewooapp/components/color_swatch_card.dart';

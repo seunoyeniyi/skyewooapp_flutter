@@ -44,7 +44,9 @@ dependencies:
   dotted_border: ^2.0.0+2
   cart_stepper: ^2.0.2
   flutter_rating_bar: ^4.0.0
-  timeline_tile: ^2.0.0
+  timelines: ^0.1.0
+  webview_flutter: ^3.0.2
+  url_launcher: ^6.1.0
 
 
   # The following adds the Cupertino Icons font to your application.

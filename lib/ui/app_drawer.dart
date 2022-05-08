@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:skyewooapp/handlers/handlers.dart';
 import 'package:skyewooapp/handlers/user_session.dart';
 import 'package:skyewooapp/main.dart';
 import 'package:skyewooapp/screens/archive/archive.dart';
-import 'package:skyewooapp/screens/orders/orders.dart';
+import 'package:skyewooapp/screens/browser.dart';
+import 'package:skyewooapp/site.dart';
+import 'package:skyewooapp/ui/tracking_dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({Key? key}) : super(key: key);
@@ -210,7 +214,22 @@ class _AppDrawerState extends State<AppDrawer> {
                   'Blog',
                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  String url = Site.ADDRESS + "blog?in_sk_app=1";
+                  url +=
+                      "&hide_elements=div*topbar.topbar, div.topbar, div.joinchat__button, div.joinchat, div*notificationx-frontend-root";
+                  //push
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AppBrowser(
+                        title: "Blog",
+                        url: url,
+                      ),
+                    ),
+                  );
+                },
               ),
               ListTile(
                 leading: SvgPicture.asset(
@@ -246,7 +265,10 @@ class _AppDrawerState extends State<AppDrawer> {
                   'Track Order',
                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  showTrackingDialog();
+                },
               ),
 
               const SizedBox(height: 30),
@@ -256,42 +278,126 @@ class _AppDrawerState extends State<AppDrawer> {
                   'Support',
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
-                onTap: () {},
+                onTap: () async {
+                  String url =
+                      "whatsapp://send?phone=919076012700?text=Hi, *WhatsDown Support Team*";
+                  final Uri uri = Uri.parse(url);
+                  if (await canLaunchUrl(uri)) {
+                    await launchUrl(uri);
+                  } else {
+                    Toaster.show(message: "No whatsapp installed");
+                  }
+                },
               ),
               ListTile(
                 title: const Text(
                   'Shipping',
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  String url = Site.ADDRESS + "shipping?in_sk_app=1";
+                  url +=
+                      "&hide_elements=div*topbar.topbar, div.topbar, div.joinchat__button, div.joinchat, div*notificationx-frontend-root";
+                  //push
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AppBrowser(
+                        title: "Shipping",
+                        url: url,
+                      ),
+                    ),
+                  );
+                },
               ),
               ListTile(
                 title: const Text(
                   'Returns',
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  String url = Site.ADDRESS + "returns?in_sk_app=1";
+                  url +=
+                      "&hide_elements=div*topbar.topbar, div.topbar, div.joinchat__button, div.joinchat, div*notificationx-frontend-root";
+                  //push
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AppBrowser(
+                        title: "Returns",
+                        url: url,
+                      ),
+                    ),
+                  );
+                },
               ),
               ListTile(
                 title: const Text(
                   'FAQs',
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  String url = Site.ADDRESS + "faqs?in_sk_app=1";
+                  url +=
+                      "&hide_elements=div*topbar.topbar, div.topbar, div.joinchat__button, div.joinchat, div*notificationx-frontend-root";
+                  //push
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AppBrowser(
+                        title: "FAQs",
+                        url: url,
+                      ),
+                    ),
+                  );
+                },
               ),
               ListTile(
                 title: const Text(
                   'Contact',
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  String url = Site.ADDRESS + "contact-us?in_sk_app=1";
+                  url +=
+                      "&hide_elements=div*topbar.topbar, div.topbar, div.joinchat__button, div.joinchat, div*notificationx-frontend-root";
+                  //push
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AppBrowser(
+                        title: "Contact",
+                        url: url,
+                      ),
+                    ),
+                  );
+                },
               ),
               ListTile(
                 title: const Text(
                   'About',
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  String url = Site.ADDRESS + "about-us?in_sk_app=1";
+                  url +=
+                      "&hide_elements=div*topbar.topbar, div.topbar, div.joinchat__button, div.joinchat, div*notificationx-frontend-root";
+                  //push
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AppBrowser(
+                        title: "About",
+                        url: url,
+                      ),
+                    ),
+                  );
+                },
               ),
               ListTile(
                 title: Text(
@@ -324,5 +430,13 @@ class _AppDrawerState extends State<AppDrawer> {
     } else {
       Navigator.pushNamed(context, "welcome");
     }
+  }
+
+  showTrackingDialog() async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return const TrackingDialog();
+        });
   }
 }

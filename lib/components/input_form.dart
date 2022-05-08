@@ -10,6 +10,7 @@ class InputForm<T> extends StatefulWidget {
     this.enableSuggestions = true,
     this.autocorrect = true,
     this.validator,
+    this.controller,
   }) : super(key: key);
 
   final TextInputType keyboardType;
@@ -17,6 +18,7 @@ class InputForm<T> extends StatefulWidget {
   final bool obscureText;
   final bool enableSuggestions;
   final bool autocorrect;
+  final TextEditingController? controller;
 
   final String? Function(String?)? validator;
 
@@ -44,6 +46,7 @@ class _InputFormState extends State<InputForm> {
           enableSuggestions: widget.enableSuggestions,
           autocorrect: widget.autocorrect,
           validator: widget.validator,
+          controller: widget.controller,
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
           decoration: InputDecoration(
             border: InputBorder.none,

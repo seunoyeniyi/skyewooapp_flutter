@@ -1,14 +1,13 @@
 import 'dart:convert';
-import 'dart:developer';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:fluttertoast/fluttertoast.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:http/http.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:skyewooapp/app_colors.dart';
 import 'package:skyewooapp/components/loading_box.dart';
 import 'package:skyewooapp/handlers/app_styles.dart';
@@ -201,7 +200,9 @@ class _ReviewsState extends State<Reviews> {
     }
     try {
       //show progress dialog
-      SmartDialog.show(widget: const LoadingBox(text: "Adding review..."));
+      SmartDialog.show(
+          clickBgDismissTemp: false,
+          widget: const LoadingBox(text: "Adding review..."));
       //fetch
       String url =
           Site.ADD_REVIEW + widget.productID + "/" + widget.userSession.ID;

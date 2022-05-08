@@ -166,7 +166,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
 
     //START
-    SmartDialog.showLoading(widget: const LoadingBox());
+    SmartDialog.showLoading(
+        clickBgDismissTemp: false, widget: const LoadingBox());
 
     String url = Site.REGISTER + "?token_key=" + Site.TOKEN_KEY;
 

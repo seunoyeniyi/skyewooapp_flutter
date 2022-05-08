@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:skyewooapp/app_colors.dart';
-import 'package:skyewooapp/models/product.dart';
 import 'package:skyewooapp/screens/cart/cart_page.dart';
 import 'package:skyewooapp/screens/categories/categories.dart';
 import 'package:skyewooapp/screens/orders/orders.dart';
@@ -12,7 +11,6 @@ import 'package:skyewooapp/screens/signup/signup_screen.dart';
 import 'package:skyewooapp/screens/welcome/welcome_screen.dart';
 import 'package:skyewooapp/ui/app_bar.dart';
 import 'package:skyewooapp/ui/app_drawer.dart';
-import 'package:skyewooapp/screens/product/product_page.dart';
 import 'package:skyewooapp/ui/shop/shop.dart';
 
 void main() {

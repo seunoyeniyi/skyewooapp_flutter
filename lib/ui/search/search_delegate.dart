@@ -1,8 +1,5 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:skyewooapp/app_colors.dart';
 import 'package:skyewooapp/components/product_card.dart';
 import 'package:skyewooapp/components/shimmer_product_card.dart';
 import 'package:skyewooapp/components/shimmer_shop.dart';

@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:html_character_entities/html_character_entities.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:http/http.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:skyewooapp/app_colors.dart';
