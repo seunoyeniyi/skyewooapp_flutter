@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:skyewooapp/app_colors.dart';
+import 'package:skyewooapp/screens/account/account.dart';
 import 'package:skyewooapp/screens/cart/cart_page.dart';
 import 'package:skyewooapp/screens/categories/categories.dart';
 import 'package:skyewooapp/screens/orders/orders.dart';
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
         "wishlist": (BuildContext context) => const WishlistPage(),
         "categories": (BuildContext context) => const CategoriesPage(),
         "orders": (BuildContext context) => const OrdersPage(),
+        "account": (BuildContext context) => const AccountPage(),
       },
     );
   }

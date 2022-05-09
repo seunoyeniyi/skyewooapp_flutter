@@ -220,9 +220,11 @@ class _AppAppBarState extends State<AppAppBar> {
   }
 
   void updateCartCount(String count) {
-    setState(() {
-      cartCount = count;
-      showCartCount = (int.parse(cartCount) > 0);
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      setState(() {
+        cartCount = count;
+        showCartCount = (int.parse(cartCount) > 0);
+      });
     });
   }
 

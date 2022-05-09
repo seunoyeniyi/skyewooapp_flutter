@@ -89,7 +89,13 @@ class _AppDrawerState extends State<AppDrawer> {
                                   style: ButtonStyle(
                                     padding:
                                         MaterialStateProperty.all<EdgeInsets>(
-                                            const EdgeInsets.all(0)),
+                                      const EdgeInsets.only(
+                                        left: 10,
+                                        right: 10,
+                                        top: 0,
+                                        bottom: 0,
+                                      ),
+                                    ),
                                     shape: MaterialStateProperty.all<
                                         RoundedRectangleBorder>(
                                       RoundedRectangleBorder(
@@ -416,7 +422,7 @@ class _AppDrawerState extends State<AppDrawer> {
   loginTapped() {
     Navigator.pop(context);
     if (userSession.logged()) {
-      //go to account
+      Navigator.pushNamed(context, "account");
     } else {
       Navigator.pushNamed(context, "welcome");
     }

@@ -11,12 +11,13 @@ class AppStyles {
     double radius = 3,
   }) {
     return TextButton.styleFrom(
-        primary: primary,
-        minimumSize: minimumSize,
-        backgroundColor: backgroundColor,
-        padding: padding,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(radius)),
-        ));
+      primary: primary,
+      minimumSize: minimumSize,
+      backgroundColor: backgroundColor,
+      padding: padding,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(radius)),
+      ),
+    );
   }
 }

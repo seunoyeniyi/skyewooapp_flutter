@@ -11,6 +11,10 @@ class InputForm<T> extends StatefulWidget {
     this.autocorrect = true,
     this.validator,
     this.controller,
+    this.fontSize = 20,
+    this.fontWeight = FontWeight.w500,
+    this.padding = const EdgeInsets.only(left: 15, right: 15),
+    this.backgroundColor = Colors.white,
   }) : super(key: key);
 
   final TextInputType keyboardType;
@@ -19,6 +23,10 @@ class InputForm<T> extends StatefulWidget {
   final bool enableSuggestions;
   final bool autocorrect;
   final TextEditingController? controller;
+  final double fontSize;
+  final FontWeight fontWeight;
+  final EdgeInsetsGeometry padding;
+  final Color backgroundColor;
 
   final String? Function(String?)? validator;
 
@@ -35,11 +43,11 @@ class _InputFormState extends State<InputForm> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          color: Colors.white,
+          color: widget.backgroundColor,
           borderRadius: BorderRadius.circular(5.0),
           border: Border.all(color: AppColors.hover)),
       child: Padding(
-        padding: const EdgeInsets.only(left: 15, right: 15),
+        padding: widget.padding,
         child: TextFormField(
           keyboardType: widget.keyboardType,
           obscureText: widget.obscureText,
@@ -47,7 +55,8 @@ class _InputFormState extends State<InputForm> {
           autocorrect: widget.autocorrect,
           validator: widget.validator,
           controller: widget.controller,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+          style: TextStyle(
+              fontSize: widget.fontSize, fontWeight: widget.fontWeight),
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: widget.hintText,
