@@ -165,7 +165,9 @@ class _OrdersPageState extends State<OrdersPage> {
                                       orderID: orders[index].getId,
                                     ),
                                   ),
-                                );
+                                ).then((value) {
+                                  fetchOrders();
+                                });
                               },
                             );
                           }),
@@ -219,6 +221,7 @@ class _OrdersPageState extends State<OrdersPage> {
 
         List<Map<String, dynamic>> jsonOrders = List.from(json["orders"]);
 
+        orders.clear();
         for (var order in jsonOrders) {
           orders.add(Order(
             id: order["ID"].toString(),

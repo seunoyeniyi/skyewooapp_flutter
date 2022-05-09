@@ -13,6 +13,8 @@ import 'package:skyewooapp/handlers/app_styles.dart';
 import 'package:skyewooapp/handlers/formatter.dart';
 import 'package:skyewooapp/handlers/handlers.dart';
 import 'package:skyewooapp/handlers/user_session.dart';
+import 'package:skyewooapp/main.dart';
+import 'package:skyewooapp/screens/payment_browser.dart';
 import 'package:skyewooapp/site.dart';
 
 class PaymentCheckoutPage extends StatefulWidget {
@@ -47,7 +49,6 @@ class _PaymentCheckoutPageState extends State<PaymentCheckoutPage> {
   bool freeShippingAvailable = true;
   bool couponAvailable = false;
   bool hasShipping = true;
-  String checkoutURL = "";
 
   @override
   void initState() {
@@ -203,7 +204,9 @@ class _PaymentCheckoutPageState extends State<PaymentCheckoutPage> {
                           padding: const EdgeInsets.only(top: 8, bottom: 8),
                         ),
                         child: const Text("Apply"),
-                        onPressed: () {},
+                        onPressed: () {
+                          applyCoupon();
+                        },
                       ),
                     ),
                   ],
@@ -261,14 +264,15 @@ class _PaymentCheckoutPageState extends State<PaymentCheckoutPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
-                                "Discount",
+                                "Coupon Discount",
                                 style: TextStyle(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 16,
                                 ),
                               ),
                               Text(
-                                Site.CURRENCY +
+                                "-" +
+                                    Site.CURRENCY +
                                     Formatter.format(couponDiscount),
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
@@ -449,7 +453,7 @@ class _PaymentCheckoutPageState extends State<PaymentCheckoutPage> {
               TextButton(
                 style: AppStyles.flatButtonStyle(),
                 onPressed: () {
-                  createOrder();
+                  createOrder("web", "pedning");
                 },
                 child: const Text(
                   "CONFIRM & PAY",
@@ -482,6 +486,7 @@ class _PaymentCheckoutPageState extends State<PaymentCheckoutPage> {
           if (json["has_coupon"].toString() == "true") {
             couponDiscount = json["coupon_discount"].toString();
             couponAvailable = true;
+            Toaster.show(message: "Coupon Applied");
           } else {
             couponAvailable = false;
           }
@@ -586,7 +591,7 @@ class _PaymentCheckoutPageState extends State<PaymentCheckoutPage> {
           couponDiscount = json["coupon_discount"].toString();
           total = json["total"].toString();
           Toaster.show(
-              message: "Shipping Method Updated", gravity: ToastGravity.TOP);
+              message: "Shipping method updated", gravity: ToastGravity.TOP);
         } else {
           Toaster.show(
               message: "Cart has no shipping go back and update your address!");
@@ -634,5 +639,121 @@ class _PaymentCheckoutPageState extends State<PaymentCheckoutPage> {
     }
   }
 
-  createOrder() async {}
+  applyCoupon() async {
+    FocusScope.of(context).unfocus();
+    SmartDialog.show(widget: const LoadingBox(), clickBgDismissTemp: false);
+
+    String coupon = couponController.text;
+
+    //fetch
+    try {
+      String url = Site.UPDATE_COUPON + userSession.ID + "/" + coupon;
+      dynamic data = {
+        "token_key": Site.TOKEN_KEY,
+      };
+
+      Response response = await post(url, body: data);
+
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
+        Map<String, dynamic> json = jsonDecode(response.body);
+
+        if (json["has_coupon"].toString() == "true") {
+          couponAvailable = true;
+          couponDiscount = json["coupon_discount"].toString();
+          Toaster.show(message: "Coupon Applied");
+        } else {
+          Toaster.show(message: "Invalid Coupon!");
+          couponAvailable = false;
+        }
+
+        subtotal = json["subtotal"].toString();
+        total = json["total"].toString();
+
+        //end
+      } else {
+        Toaster.show(message: "Unable to apply coupon.");
+      }
+    } finally {
+      SmartDialog.dismiss();
+      setState(() {});
+    }
+  }
+
+  createOrder(String paymentMethod, String status) async {
+    SmartDialog.show(
+        widget: const LoadingBox(text: "Creating Order..."),
+        clickBgDismissTemp: false);
+
+    try {
+      //fetch
+      String url = Site.CREATE_ORDER + userSession.ID;
+      dynamic data = {
+        "token_key=": Site.TOKEN_KEY,
+      };
+      if (paymentMethod != "web") {
+        data["payment_method"] = paymentMethod;
+      }
+      if (paymentMethod != "paypal") {
+        data["clear_cart"] = "1";
+      }
+
+      Response response = await post(url, body: data);
+
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
+        Map<String, dynamic> json = jsonDecode(response.body);
+
+        if (json["cart_empty"].toString() == "true" ||
+            json["cart_exists"].toString() == "false" ||
+            !json.containsKey("info")) {
+          //
+          Toaster.show(
+            message: "Cannot create order because cart is empty or not found.",
+            gravity: ToastGravity.TOP,
+          );
+        } else {
+          //order created
+          //we are using web payment method only in this app
+          // if (paymentMethod == "web" || ) {
+          //get pending payment url and parse to payment browser
+          Map<String, dynamic> info = json["info"];
+          String checkoutURL = info["checkout_payment_url"].toString();
+          checkoutURL += "&sk-web-payment=1&sk-user-checkout=" + userSession.ID;
+          checkoutURL += "&in_sk_app=1";
+          checkoutURL +=
+              "&hide_elements=div*topbar.topbar, div.topbar, div.joinchat__button, div.joinchat, div*notificationx-frontend-root";
+
+          //push
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PaymentBrowser(
+                url: checkoutURL,
+              ),
+            ),
+          ).then((value) {
+            //pop to root
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyHomePage(
+                    navigateTo: "orders",
+                    title: Site
+                        .NAME, //home page header title - not orders page title
+                  ),
+                ),
+                (route) => false);
+          });
+          // }
+
+        }
+
+        //end
+      } else {
+        Toaster.show(message: "Unable to create order... Try Again");
+      }
+    } finally {
+      SmartDialog.dismiss();
+      setState(() {});
+    }
+  }
 }

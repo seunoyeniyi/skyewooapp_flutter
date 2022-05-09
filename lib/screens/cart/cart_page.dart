@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:skyewooapp/app_colors.dart';
 import 'package:skyewooapp/components/input_form.dart';
+import 'package:skyewooapp/components/loading_box.dart';
 import 'package:skyewooapp/controllers/carts_controller.dart';
 import 'package:skyewooapp/handlers/app_styles.dart';
 import 'package:skyewooapp/handlers/formatter.dart';
@@ -147,7 +150,7 @@ class _CartPageState extends State<CartPage> {
                       }),
                     ),
                   ),
-                  //coupon container
+                  //coupon text field container
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -185,7 +188,9 @@ class _CartPageState extends State<CartPage> {
                               padding: const EdgeInsets.only(top: 8, bottom: 8),
                             ),
                             child: const Text("Apply"),
-                            onPressed: () {},
+                            onPressed: () {
+                              applyCoupon();
+                            },
                           ),
                         ),
                       ],
@@ -371,5 +376,21 @@ class _CartPageState extends State<CartPage> {
         }),
       ),
     );
+  }
+
+  applyCoupon() async {
+    SmartDialog.show(widget: const LoadingBox(), clickBgDismissTemp: false);
+
+    Map<String, dynamic> result =
+        await cartsController.applyCoupon(couponController.text);
+
+    if (result["message"].toString().isNotEmpty) {
+      Toaster.show(
+        message: result["message"].toString(),
+        gravity: ToastGravity.TOP,
+      );
+    }
+
+    SmartDialog.dismiss();
   }
 }

@@ -8,6 +8,7 @@ import 'package:skyewooapp/screens/checkout_address/checkout_address.dart';
 import 'package:skyewooapp/screens/orders/orders.dart';
 import 'package:skyewooapp/screens/payment_checkout/payment_checkout.dart';
 import 'package:skyewooapp/screens/wishlist/wishlist_page.dart';
+import 'package:skyewooapp/site.dart';
 import 'package:skyewooapp/ui/home/home.dart';
 import 'package:skyewooapp/screens/login/login_screen.dart';
 import 'package:skyewooapp/screens/signup/signup_screen.dart';
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Woo App',
+      title: Site.NAME,
       theme: ThemeData(
         fontFamily: "Montserrat",
         primarySwatch: AppColors.primarySwatch,
@@ -56,9 +57,11 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({Key? key, required this.title, this.navigateTo = ""})
+      : super(key: key);
 
   final String title;
+  final String navigateTo;
 
   //SETUP STATIC FUNCTIONS
   static void restartApp(BuildContext context) {
@@ -104,6 +107,20 @@ class _MyHomePageState extends State<MyHomePage> {
   ];
   int _bodyIndex = 0;
 
+  init() async {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      if (widget.navigateTo == "orders") {
+        Navigator.pushNamed(context, "orders");
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    init();
+    super.initState();
+  }
+
   void restartApp() {
     resetAppBar();
     setState(() {
@@ -124,6 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return KeyedSubtree(
       key: key,
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppAppBar(
           controller: appBarController,
         ),

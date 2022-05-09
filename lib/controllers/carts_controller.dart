@@ -73,13 +73,16 @@ class CartsController extends GetxController {
         }
 
         subtotal.value = json["subtotal"].toString();
+
         double subtotalDouble = double.parse(json["subtotal"].toString());
         double couponDiscountDouble = 0;
         double rewardDiscountDouble = 0;
+
         if (json["has_coupon"].toString() == "true") {
           couponDiscountDouble =
               double.parse(json["coupon_discount"].toString());
           couponDiscount.value = json["coupon_discount"].toString();
+          messages.add("Coupon Applied");
         }
         if (json["apply_reward"].toString() == "true") {
           rewardDiscountDouble =
@@ -193,5 +196,53 @@ class CartsController extends GetxController {
     } finally {
       totalLoading.value = false;
     }
+  }
+
+  Future<Map<String, dynamic>> applyCoupon(String coupon) async {
+    bool applied = false;
+    String message = "";
+
+    //fetch
+    String url = Site.UPDATE_COUPON + userSession.value.ID + "/" + coupon;
+    dynamic data = {
+      "token_key": Site.TOKEN_KEY,
+    };
+
+    Response response = await post(url, body: data);
+
+    if (response.statusCode == 200 && response.body.isNotEmpty) {
+      Map<String, dynamic> json = jsonDecode(response.body);
+
+      double subtotalDouble = double.parse(json["subtotal"].toString());
+      double couponDiscountDouble = 0;
+      double rewardDiscountDouble = 0;
+
+      if (json["has_coupon"].toString() == "true") {
+        hasCoupon.value = true;
+        couponDiscountDouble = double.parse(json["coupon_discount"].toString());
+        //shipping cost might have been added (so, total will be calculated here) - after getting out of this condition at the bottom
+
+        couponDiscount.value = json["coupon_discount"].toString();
+        message = "Coupon Applied";
+      } else {
+        message = "Invalid Coupon!";
+        hasCoupon.value = false;
+      }
+
+      subtotal.value = json["subtotal"].toString();
+      //calculate total
+      total.value =
+          (subtotalDouble - couponDiscountDouble - rewardDiscountDouble)
+              .toString();
+
+      //end
+    } else {
+      message = "Unable to apply coupon.";
+    }
+
+    return {
+      "applied": applied,
+      "message": message,
+    };
   }
 }

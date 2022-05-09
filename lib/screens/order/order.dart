@@ -147,7 +147,12 @@ class _OrderPageState extends State<OrderPage> {
                             alignment: Alignment.centerRight,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.all(20),
+                                padding: const EdgeInsets.only(
+                                  left: 20,
+                                  right: 20,
+                                  bottom: 5,
+                                  top: 5,
+                                ),
                                 shape: const RoundedRectangleBorder(
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(50),
@@ -161,6 +166,7 @@ class _OrderPageState extends State<OrderPage> {
                                   MaterialPageRoute(
                                     builder: (context) => PaymentBrowser(
                                       url: checkoutUrl,
+                                      from: "order",
                                     ),
                                   ),
                                 ).then((value) {
@@ -663,6 +669,7 @@ class _OrderPageState extends State<OrderPage> {
               ".";
 
           //order items
+          orderItems.clear();
           List<Map<String, dynamic>> jsonItems = List.from(json["products"]);
           for (var item in jsonItems) {
             orderItems.add(OrderItem(
