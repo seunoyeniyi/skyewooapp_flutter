@@ -186,7 +186,7 @@ class _AccountPageState extends State<AccountPage> {
               InputForm(
                 controller: phone2Controller,
                 keyboardType: TextInputType.phone,
-                hintText: "Altanate Phone",
+                hintText: "Alternate Phone",
                 fontSize: 18,
               ),
               const SizedBox(height: 10),

@@ -79,6 +79,7 @@ class CartsController extends GetxController {
         if (json["has_coupon"].toString() == "true") {
           couponDiscountDouble =
               double.parse(json["coupon_discount"].toString());
+          couponDiscount.value = json["coupon_discount"].toString();
         }
         if (json["apply_reward"].toString() == "true") {
           rewardDiscountDouble =

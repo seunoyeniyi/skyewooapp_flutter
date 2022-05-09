@@ -4,7 +4,9 @@ import 'package:skyewooapp/app_colors.dart';
 import 'package:skyewooapp/screens/account/account.dart';
 import 'package:skyewooapp/screens/cart/cart_page.dart';
 import 'package:skyewooapp/screens/categories/categories.dart';
+import 'package:skyewooapp/screens/checkout_address/checkout_address.dart';
 import 'package:skyewooapp/screens/orders/orders.dart';
+import 'package:skyewooapp/screens/payment_checkout/payment_checkout.dart';
 import 'package:skyewooapp/screens/wishlist/wishlist_page.dart';
 import 'package:skyewooapp/ui/home/home.dart';
 import 'package:skyewooapp/screens/login/login_screen.dart';
@@ -44,6 +46,10 @@ class MyApp extends StatelessWidget {
         "categories": (BuildContext context) => const CategoriesPage(),
         "orders": (BuildContext context) => const OrdersPage(),
         "account": (BuildContext context) => const AccountPage(),
+        "checkout_address": (BuildContext context) =>
+            const CheckoutAddressPage(),
+        "payment_checkout": (BuildContext context) =>
+            const PaymentCheckoutPage(),
       },
     );
   }

@@ -314,6 +314,11 @@ class _CartPageState extends State<CartPage> {
                               child: const Text("CHECKOUT"),
                               onPressed: () {
                                 if (cartsController.checkoutEnabled.value) {
+                                  Navigator.pushNamed(
+                                          context, "checkout_address")
+                                      .then((value) {
+                                    cartsController.fetchCart();
+                                  });
                                 } else {
                                   Toaster.show(
                                       message:

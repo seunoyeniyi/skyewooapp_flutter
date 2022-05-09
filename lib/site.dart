@@ -23,15 +23,15 @@ class Site {
   static String USER = ADDRESS + "wp-json/skye-api/v1/user-info/";
   static String UPDATE_USER = ADDRESS + "wp-json/skye-api/v1/update-user-info/";
   static String UPDATE_SHIPPING =
-      ADDRESS + "wp-json/skye-api/v2/update-user-shipping-address/"; //v2
+      ADDRESS + "wp-json/skye-api/v1/update-user-shipping-address/";
   static String UPDATE_CART_SHIPPING =
-      ADDRESS + "wp-json/skye-api/v2/update-cart-shipping/"; //v2
+      ADDRESS + "wp-json/skye-api/v1/update-cart-shipping/";
   static String CREATE_ORDER =
       ADDRESS + "wp-json/skye-api/v2/create-order/"; //v2
   static String UPDATE_COUPON =
       ADDRESS + "wp-json/skye-api/v1/update-cart-coupon/";
   static String CHANGE_CART_SHIPPING =
-      ADDRESS + "wp-json/skye-api/v2/change-cart-shipping-method/"; //v2
+      ADDRESS + "wp-json/skye-api/v1/change-cart-shipping-method/";
   static String ORDERS = ADDRESS + "wp-json/skye-api/v1/orders/";
   static String ORDER = ADDRESS + "wp-json/skye-api/v1/order/";
   static String UPDATE_ORDER = ADDRESS + "wp-json/skye-api/v1/update-order/";
